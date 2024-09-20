@@ -22,11 +22,24 @@ function App() {
 
   const [selectedCharacter, setSelectedCharacter] = useState(null);
   const [selectedButtonText, setSelectedButtonText] = useState(null); // Track the selected button text
-
+  const [walletAddress, setWalletAddress] = useState(null);
+  const [showAlert, setShowAlert] = useState(false);
 
   const handleClick = (buttonIndex) => {
     setSelectedButtonText(`${(buttonIndex + 1) * 5}$`);
     setIsModalOpen(true); // Open the character selection modal
+  };
+
+  const handleFightClick = () => {
+    if (!walletAddress) {
+      console.log("olmadibe")
+      setShowAlert(true); 
+      
+    } else {
+      // Proceed with fight logic
+      console.log("Fight started!");
+      alert("Please connect your wallet second!");
+    }
   };
 
   const handleCharacterSelect = (character) => {
@@ -35,9 +48,19 @@ function App() {
     setIsButtonsOpen(false);
   };
 
+  const handleCloseAlert = () => {
+    setShowAlert(false);  // Close the custom alert
+  };
+
+  const handleUndoClick = () => {
+    setSelectedCharacter(null);
+    setIsButtonsOpen(true); // Show the main screen with the buttons
+    setSelectedButtonText(null); // Reset button text
+  };
+
   return (
     <div className="App">
-      <Navbar />
+      <Navbar setWalletAddress={setWalletAddress} />
       <h1 className="duel-text">Duel!</h1>
 
       {isButtonsOpen && (<div className="button-container">
@@ -88,10 +111,28 @@ function App() {
           <p>{selectedCharacter.info}</p>
           <p>Health: {selectedCharacter.health}</p>
           <p>Fight Score: {selectedCharacter.fightScore}</p>
-          <h2>Selected: {selectedButtonText}</h2>
-          <button className="fight-button-fancy">Fight!</button>
+          <h2 className="selected-amount">Selected: {selectedButtonText}</h2>
+          <button className="fight-button-fancy" onClick={() => handleFightClick()} >Fight!</button>
+
+          {/* Undo Button inside character info */}
+          <button className="undo-button" onClick={handleUndoClick}>
+            &#x21A9; {/* Unicode for Undo symbol */}
+          </button>
+
         </div>
       )}
+
+      {/* Fancy Alert Message */}
+      {showAlert && (
+        <div className="custom-alert">
+          <div className="alert-content">
+            <h2>Oops!</h2>
+            <p>Please connect your wallet first.</p>
+            <button onClick={handleCloseAlert} className="alert-button">Close</button>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

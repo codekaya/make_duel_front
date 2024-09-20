@@ -135,7 +135,7 @@ body {
   gap: 1rem;
   justify-content: center;
 } */
-
+/*----------------------------------------------------------------------------------------------------*/
 .character-list {
   display: grid; /* Use CSS grid instead of flexbox */
   grid-template-columns: repeat(3, 100px); /* Create 3 columns, each 100px wide */
@@ -181,12 +181,13 @@ body {
 /* Display Selected Character Info */
 .character-info {
   margin-top: 2rem;
-  margin-bottom: 5rem; /* Add margin from the bottom */
+  margin-bottom: 5rem;
   color: white;
   font-size: 1.2rem;
   background-color: rgba(0, 0, 0, 0.5);
   padding: 1rem;
   border-radius: 10px;
+  position: relative; 
 }
 
 .selected-character-image {
@@ -195,7 +196,7 @@ body {
   border-radius: 10px;
   object-fit: fill;
 }
-
+/*----------------------------------------------------------------------------------------------------*/
 .character-info-overlay {
   position: absolute;
   top: 0;
@@ -228,24 +229,7 @@ body {
   font-size: 12px;
 }
 
-/* Fancy Fight Button */
-/* .fight-button-fancy {
-  background-color: #007bff;
-  border: none;
-  color: white;
-  padding: 15px 30px;
-  font-size: 1.5rem;
-  border-radius: 12px;
-  cursor: pointer;
-  margin-top: 20px;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-.fight-button-fancy:hover {
-  background-color: #0056b3;
-  transform: scale(1.1);
-} */
-
+/*----------------------------------------------------------------------------------------------------*/
 /* Fancy Fight Button */
 .fight-button-fancy {
   background-color: #007bff; /* Blue background */
@@ -282,3 +266,99 @@ body {
     box-shadow: 0 0 15px rgba(0, 123, 255, 0.7), 0 0 30px rgba(0, 123, 255, 0.5);
   }
 }
+
+/*----------------------------------------------------------------------------------------------------*/
+/* Custom Alert Styling */
+.custom-alert {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);  /* Dark background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.alert-content {
+  background-color: white;
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+  animation: popUp 0.3s ease-in-out;
+}
+
+.alert-content h2 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.alert-content p {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+.alert-button {
+  padding: 10px 20px;
+  background-color: #ff416c;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.alert-button:hover {
+  background-color: #ff4b2b;
+}
+
+/* Animation for popping up */
+@keyframes popUp {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+/*----------------------------------------------------------------------------------------------------*/
+/* Undo Button Styling */
+/* Undo Button Styling */
+.undo-button {
+  position: absolute;
+  bottom: 10px;
+  left: 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  font-size: 32px;
+  cursor: pointer;
+  box-shadow: 0px 5px 15px rgba(0, 123, 255, 0.5);
+  transition: transform 0.3s, background-color 0.3s;
+}
+
+.undo-button:hover {
+  background-color: #0056b3;
+  transform: scale(1.1); /* Slight zoom on hover */
+}
+
+
+
+/*----------------------------------------------------------------------------------------------------*/
+/* Styling for Selected Amount (Dollar) */
+.selected-amount {
+  font-size: 2rem; /* Make it bigger */
+  color: #FFD700; /* Gold color for attention */
+  font-weight: bold; /* Make it bold */
+  text-shadow: 0px 0px 10px rgba(255, 215, 0, 0.8); /* Glowing effect */
+  margin-top: 20px;
+}
+/*----------------------------------------------------------------------------------------------------*/

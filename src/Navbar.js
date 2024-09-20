@@ -3,8 +3,8 @@ import React, { useState, useEffect } from 'react';
 import './Navbar.css';
 import { Connection, PublicKey } from '@solana/web3.js';
 
-function Navbar() {
-  const [walletAddress, setWalletAddress] = useState(null);
+function Navbar({ setWalletAddress }) {
+   const [walletAddress, setLocalWalletAddress] = useState(null);
 
   // Check if Phantom is installed
   const isPhantomInstalled = () => {
@@ -18,6 +18,7 @@ function Navbar() {
         const { solana } = window;
         const response = await solana.connect();
         setWalletAddress(response.publicKey.toString());
+        setLocalWalletAddress(response.publicKey.toString());
         console.log("Connected to wallet: ", response.publicKey.toString());
       } catch (err) {
         console.error("Wallet connection failed: ", err);
@@ -31,12 +32,14 @@ function Navbar() {
   useEffect(() => {
     if (isPhantomInstalled()) {
       const { solana } = window;
-      solana.on("connect", () => setWalletAddress(solana.publicKey.toString()));
-      if (solana.isConnected) {
-        setWalletAddress(solana.publicKey.toString());
-      }
+      solana.on("connect", () => {
+        const wallet = solana.publicKey.toString();
+        setWalletAddress(wallet);  // Update the wallet address in App.js
+        setLocalWalletAddress(wallet); // Update the local wallet address in Navbar
+      });
+
     }
-  }, []);
+  }, [setWalletAddress]);
 
   return (
     <nav className="navbar">
