@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import Navbar from './Navbar';
 
@@ -25,6 +25,19 @@ function App() {
   const [walletAddress, setWalletAddress] = useState(null);
   const [showAlert, setShowAlert] = useState(false);
 
+  const [opponentCharacter, setOpponentCharacter] = useState(null); // Add opponent character
+  const [fightStarted, setFightStarted] = useState(false); // Track if the fight has started
+  const [playerHealth, setPlayerHealth] = useState(100); // Player health
+  const [opponentHealth, setOpponentHealth] = useState(100); // Opponent health
+
+  const [showAnimation, setShowAnimation] = useState(true); // Track if the fight animation should show
+  const [shakePlayer, setShakePlayer] = useState(false);
+  const [shakeOpponent, setShakeOpponent] = useState(false);
+
+  const [isGameOver, setIsGameOver] = useState(false); // Track if game is over
+  const [winner, setWinner] = useState(null); // Track who won the game
+
+
   const handleClick = (buttonIndex) => {
     setSelectedButtonText(`${(buttonIndex + 1) * 5}$`);
     setIsModalOpen(true); // Open the character selection modal
@@ -38,7 +51,13 @@ function App() {
     } else {
       // Proceed with fight logic
       console.log("Fight started!");
-      alert("Please connect your wallet second!");
+      
+      setFightStarted(true); // Start the fight
+      setOpponentCharacter(characters[Math.floor(Math.random() * characters.length)]); // Random opponent
+      setShowAnimation(true); // Show animation
+      setTimeout(() => {
+        setShowAnimation(false); // Hide animation after 2 seconds
+      }, 2000);
     }
   };
 
@@ -48,6 +67,42 @@ function App() {
     setIsButtonsOpen(false);
   };
 
+
+// Handle attack action for the player
+const handlePlayerAttack = () => {
+  setOpponentHealth((prevHealth) => {
+    const newHealth = Math.max(prevHealth - 10, 0);
+    if (newHealth < prevHealth) {
+      setShakeOpponent(true);
+      setTimeout(() => setShakeOpponent(false), 500); // Remove shake after 0.5s
+    }
+    return newHealth;
+  });
+};
+
+const handleOpponentAttack = () => {
+  setPlayerHealth((prevHealth) => {
+    const newHealth = Math.max(prevHealth - 10, 0);
+    if (newHealth < prevHealth) {
+      setShakePlayer(true);
+      setTimeout(() => setShakePlayer(false), 500); // Remove shake after 0.5s
+    }
+    return newHealth;
+  });
+};
+
+ // Detect if the game is over when health reaches 0
+ useEffect(() => {
+  if (playerHealth === 0) {
+    setIsGameOver(true);
+    setWinner("Opponent");
+  } else if (opponentHealth === 0) {
+    setIsGameOver(true);
+    setWinner("Player");
+  }
+}, [playerHealth, opponentHealth]);
+
+
   const handleCloseAlert = () => {
     setShowAlert(false);  // Close the custom alert
   };
@@ -56,14 +111,21 @@ function App() {
     setSelectedCharacter(null);
     setIsButtonsOpen(true); // Show the main screen with the buttons
     setSelectedButtonText(null); // Reset button text
+    setFightStarted(false); // Reset the fight state
+    setPlayerHealth(100); // Reset health
+    setOpponentHealth(100); // Reset health
+    setIsGameOver(false); // Reset game over state
+    setWinner(null); // Reset winner
   };
 
   return (
     <div className="App">
       <Navbar setWalletAddress={setWalletAddress} />
-      <h1 className="duel-text">Duel!</h1>
+      
+      {!fightStarted && (<h1 className="duel-text">Duel!</h1>)}
 
-      {isButtonsOpen && (<div className="button-container">
+      {/* Main Screen: Button Grid */}
+      {isButtonsOpen && !fightStarted && (<div className="button-container">
         {[...Array(9)].map((_, index) => (
           <button
             key={index}
@@ -79,7 +141,7 @@ function App() {
       
 
       {/* Modal for Character Selection */}
-      {isModalOpen && (
+      {isModalOpen && !fightStarted && (
         <div className="modal">
           <div className="modal-content">
             <h2>Select Your Character</h2>
@@ -104,7 +166,7 @@ function App() {
       )}
 
       {/* Display Selected Character Info */}
-      {selectedCharacter && (
+      {selectedCharacter && !fightStarted && (
         <div className="character-info">
           <img src={selectedCharacter.image} alt={selectedCharacter.name} className="selected-character-image" />
           <h2>Selected Character: {selectedCharacter.name}</h2>
@@ -119,6 +181,69 @@ function App() {
             &#x21A9; {/* Unicode for Undo symbol */}
           </button>
 
+        </div>
+      )}
+
+      {/* Fight Start Animation */}
+      {fightStarted && showAnimation && (
+        <div className="fight-animation">
+          <h1 className="fight-text">Fight!</h1>
+        </div>
+      )}
+
+      {/* Game Screen */}
+      {fightStarted && !showAnimation && selectedCharacter && opponentCharacter && (
+        <div className="game-screen">
+          <div className="game-characters">
+            {/* Player's Character */}
+            <div className={`character player`}>
+              <div className={`character-content ${shakePlayer ? 'shake' : ''}`}>
+                <img src={selectedCharacter.image} alt={selectedCharacter.name} />
+                <p>{selectedCharacter.name}</p>
+                <div className="health-bar">
+                  <div
+                    className="health"
+                    style={{ width: `${playerHealth}%` }}
+                  ></div>
+                  <div className="health-text">{playerHealth}/100</div>
+                </div>
+                <div className="action-buttons">
+                  <button className="attack-button" onClick={handlePlayerAttack}>Attack</button>
+                  <button className="hide-button" onClick={() => setPlayerHealth(playerHealth)}>Hide</button>
+                </div>
+              </div>
+            </div>
+
+            {/* Opponent's Character */}
+            <div className={`character opponent`}>
+              <div className={`character-content ${shakeOpponent ? 'shake' : ''}`}>
+                <img src={opponentCharacter.image} alt={opponentCharacter.name} />
+                <p>{opponentCharacter.name}</p>
+                <div className="health-bar">
+                  <div
+                    className="health"
+                    style={{ width: `${opponentHealth}%` }}
+                  ></div>
+                  <div className="health-text">{opponentHealth}/100</div>
+                </div>
+                <div className="action-buttons">
+                  <button  className="attack-button" onClick={handleOpponentAttack}>Attack</button>
+                  <button  className="hide-button" onClick={() => setOpponentHealth(opponentHealth)}>Hide</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+        {/* Game Over Pop-up */}
+        {isGameOver && (
+        <div className="custom-alert">
+          <div className="alert-content">
+            <h2>{winner === "Player" ? "You Win!" : "You Lose!"}</h2>
+            <p>{`Selected amount: ${selectedButtonText}`}</p>
+            <button onClick={handleUndoClick} className="alert-button">Play Again</button>
+          </div>
         </div>
       )}
 

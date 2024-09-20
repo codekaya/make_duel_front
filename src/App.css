@@ -362,3 +362,295 @@ body {
   margin-top: 20px;
 }
 /*----------------------------------------------------------------------------------------------------*/
+/* Fight Blast Animation */
+.fight-animation {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(255,69,58,1) 0%, rgba(255,195,0,1) 50%, rgba(255,69,58,0) 100%);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: blastEffect 1.5s ease-out forwards;
+  opacity: 0;
+}
+
+.fight-text {
+  color: #ffffff;
+  font-size: 4rem;
+  font-family: 'Press Start 2P', cursive;
+  text-shadow: 0 0 20px #ff416c, 0 0 40px #ff4b2b;
+  opacity: 0;
+  animation: textFadeIn 1s ease forwards 0.5s; /* Delay to match the blast */
+}
+
+@keyframes blastEffect {
+  0% {
+    width: 50px;
+    height: 50px;
+    opacity: 0.8;
+    background: radial-gradient(circle, rgba(255,69,58,1) 0%, rgba(255,195,0,1) 50%, rgba(255,69,58,0) 100%);
+  }
+  50% {
+    width: 400px;
+    height: 400px;
+    opacity: 1;
+    background: radial-gradient(circle, rgba(255,255,0,1) 0%, rgba(255,69,58,1) 50%, rgba(255,69,58,0) 100%);
+  }
+  100% {
+    width: 500px;
+    height: 500px;
+    opacity: 0;
+    background: radial-gradient(circle, rgba(255,0,0,0) 0%, rgba(255,69,58,0) 50%, rgba(255,0,0,0) 100%);
+  }
+}
+
+@keyframes textFadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+
+/* Game Screen Styling */
+/* Game Screen Styling */
+.game-screen {
+  position: relative;
+  height: 100vh; /* Full viewport height */
+  width: 100vw; /* Full viewport width */
+  display: flex;
+  justify-content: space-between; /* Keep characters at the sides */
+  align-items: center;
+}
+
+/* Wrapper for character content to ensure shake happens only inside this box */
+.character-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Player's character on the left */
+.character.player {
+  position: absolute;
+  left: 50px; /* Add padding from the left side */
+  top: 50%; /* Center vertically */
+  transform: translateY(-50%);
+  text-align: left;
+  width: 20%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.character.player img {
+  width: 300px; /* Larger player image */
+  height: 300px;
+}
+
+/* Opponent's character on the right */
+.character.opponent {
+  position: absolute;
+  right: 50px; /* Add padding from the right side */
+  top: 50%; /* Center vertically */
+  transform: translateY(-50%);
+  text-align: right;
+  width: 20%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.character.opponent img {
+  width: 300px; /* Larger opponent image */
+  height: 300px;
+}
+
+/* Health bars */
+/* Fancy retro health bar */
+/* Fancy retro health bar with pixelated style */
+.health-bar {
+  position: relative;
+  background-color: #222;
+  border: 6px solid #ffffff; /* Thicker, pixelated border */
+  border-radius: 2px; /* Sharper corners for a pixelated look */
+  width: 100%;
+  height: 30px; /* Height reduced to give it a pixel-style ratio */
+  margin-top: 10px;
+  overflow: hidden;
+  box-shadow: 0px 0px 10px rgba(255, 0, 0, 0.7);
+  font-family: 'Press Start 2P', cursive; /* Retro game font */
+  image-rendering: pixelated; /* Ensure pixelated effect */
+}
+
+/* Pixelated health fill */
+.health {
+  background: repeating-linear-gradient(
+    -45deg,
+    #ff0000,
+    #ff0000 10px,
+    #ff4b2b 10px,
+    #ff4b2b 20px
+  ); /* Pixelated gradient */
+  height: 100%;
+  width: 100%;
+  transition: width 0.4s steps(10); /* Blocky transition */
+  box-shadow: inset 0px 0px 10px rgba(255, 0, 0, 0.7);
+  image-rendering: pixelated; /* Ensures blocky, pixelated look */
+  border-right: 2px solid #ffffff; /* Pixelated right border */
+}
+
+/* Retro text inside the health bar */
+.health-text {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #fff;
+  font-size: 12px; /* Small, pixelated font */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  line-height: 30px; /* Vertically center text in the bar */
+  font-family: 'Press Start 2P', cursive; /* Retro game font */
+}
+
+/* Pulsating pixelated glow for the health bar */
+@keyframes pixelPulse {
+  0% {
+    box-shadow: 0px 0px 10px rgba(255, 0, 0, 0.8);
+  }
+  50% {
+    box-shadow: 0px 0px 20px rgba(255, 0, 0, 1);
+  }
+  100% {
+    box-shadow: 0px 0px 10px rgba(255, 0, 0, 0.8);
+  }
+}
+
+/* Apply the pulsating glow */
+.health-bar {
+  animation: pixelPulse 1.5s infinite;
+}
+
+
+/* Shake effect */
+.shake {
+  position: relative;
+  animation: shake 0.5s;
+
+}
+
+@keyframes shake {
+  0% { transform: translate(1px, 1px) rotate(0deg); }
+  10% { transform: translate(-1px, -2px) rotate(-1deg); }
+  20% { transform: translate(-3px, 0px) rotate(1deg); }
+  30% { transform: translate(3px, 2px) rotate(0deg); }
+  40% { transform: translate(1px, -1px) rotate(1deg); }
+  50% { transform: translate(-1px, 2px) rotate(-1deg); }
+  60% { transform: translate(-3px, 1px) rotate(0deg); }
+  70% { transform: translate(3px, 1px) rotate(-1deg); }
+  80% { transform: translate(-1px, -1px) rotate(1deg); }
+  90% { transform: translate(1px, 2px) rotate(0deg); }
+  100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+/* Shake effect when health decreases */
+
+
+.flash {
+  animation: healthFlash 0.5s; /* Flash the health bar */
+}
+
+
+
+
+/* Buttons for actions (Attack, Hide) */
+/* Fancy button base styling */
+.action-buttons button {
+  background-color: #28a745; /* Green for Attack */
+  color: white;
+  font-family: 'Press Start 2P', cursive; /* Retro font */
+  font-size: 1.2rem;
+  padding: 15px 30px; /* Larger padding for a fancier look */
+  border: 4px solid #000; /* Bold, blocky border for pixelated look */
+  border-radius: 10px; /* Rounded corners for retro look */
+  text-transform: uppercase; /* All caps for impact */
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.5); /* Green glow for Attack */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth animations */
+  margin: 10px; /* Space between buttons */
+  outline: none; /* Remove focus outline */
+}
+
+/* Attack button hover effect */
+.action-buttons button:hover {
+  transform: scale(1.1); /* Slight zoom on hover */
+  box-shadow: 0 0 30px rgba(0, 255, 0, 0.8), 0 0 60px rgba(0, 255, 0, 0.6); /* Stronger glow */
+  background-color: #218838; /* Darker green on hover */
+}
+
+/* Hide button specific style */
+.action-buttons .hide-button {
+  background-color: #dc3545; /* Red for Hide button */
+  box-shadow: 0 0 15px rgba(255, 0, 0, 0.5); /* Red glow for Hide */
+}
+
+/* Hide button hover effect */
+.action-buttons .hide-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 30px rgba(255, 0, 0, 0.8), 0 0 60px rgba(255, 0, 0, 0.6); /* Stronger red glow */
+  background-color: #c82333; /* Darker red on hover */
+}
+
+/* Pulsating animation for the buttons to give a retro feel */
+@keyframes pulseButton {
+  0% {
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(0, 255, 0, 1);
+  }
+  100% {
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+  }
+}
+
+.action-buttons button {
+  animation: pulseButton 2s infinite alternate; /* Pulsating animation */
+}
+
+/* Pulsating effect specific to the Hide button */
+@keyframes pulseHideButton {
+  0% {
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(255, 0, 0, 1);
+  }
+  100% {
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+  }
+}
+
+.action-buttons .hide-button {
+  animation: pulseHideButton 2s infinite alternate; /* Pulsating animation for hide */
+}
+
+
+
+/*----------------------------------------------------------------------------------------------------*/
