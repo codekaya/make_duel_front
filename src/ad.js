@@ -18,21 +18,17 @@ const characters = [
 function App() {
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isButtonsOpen, setIsButtonsOpen] = useState(true);
-
   const [selectedCharacter, setSelectedCharacter] = useState(null);
   const [selectedButtonText, setSelectedButtonText] = useState(null); // Track the selected button text
 
-
   const handleClick = (buttonIndex) => {
-    setSelectedButtonText(`${(buttonIndex + 1) * 5}$`);
+    setSelectedButtonText(`${(buttonIndex + 1) * 5}$`); // Save the text of the clicked button
     setIsModalOpen(true); // Open the character selection modal
   };
 
   const handleCharacterSelect = (character) => {
     setSelectedCharacter(character);
     setIsModalOpen(false); // Close the modal after character selection
-    setIsButtonsOpen(false);
   };
 
   return (
@@ -40,55 +36,35 @@ function App() {
       <Navbar />
       <h1 className="duel-text">Duel!</h1>
 
-      {isButtonsOpen && (<div className="button-container">
-        {[...Array(9)].map((_, index) => (
-          <button
-            key={index}
-            className="fight-button"
-            //onClick={handleClick}
-            onClick={() => handleClick(index)}
-            disabled={loading}
-          >
-            {loading ? "Loading..." : `${(index + 1) * 5}$`}
-          </button>
-        ))}
-      </div>)}
-      
-
-      {/* Modal for Character Selection */}
-      {isModalOpen && (
-        <div className="modal">
-          <div className="modal-content">
-            <h2>Select Your Character</h2>
-            <div className="character-list">
-              {characters.map((character) => (
-                <div 
-                  key={character.id} 
-                  className="character-option" 
-                  onClick={() => handleCharacterSelect(character)}
-                >
-                  <img src={character.image} alt={character.name} className="character-image" />
-                  <div className="character-info-overlay">
-                    <h3>{character.name}</h3>
-                    <p>Health: {character.health}</p>
-                    <p>Fight Score: {character.fightScore}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+      {/* Hide button container after character selection */}
+      {!selectedCharacter && (
+        <div className="button-container">
+          {[...Array(9)].map((_, index) => (
+            <button
+              key={index}
+              className="fight-button"
+              onClick={() => handleClick(index)}
+              disabled={loading}
+            >
+              {loading ? "Loading..." : `${(index + 1) * 5}$`}
+            </button>
+          ))}
         </div>
       )}
 
-      {/* Display Selected Character Info */}
+      {/* Display selected character info and previously selected button text */}
       {selectedCharacter && (
-        <div className="character-info">
-          <img src={selectedCharacter.image} alt={selectedCharacter.name} className="selected-character-image" />
-          <h2>Selected Character: {selectedCharacter.name}</h2>
-          <p>{selectedCharacter.info}</p>
-          <p>Health: {selectedCharacter.health}</p>
-          <p>Fight Score: {selectedCharacter.fightScore}</p>
+        <div className="character-info-section">
           <h2>Selected: {selectedButtonText}</h2>
+          <div className="character-info">
+            <img src={selectedCharacter.image} alt={selectedCharacter.name} className="selected-character-image" />
+            <h2>Selected Character: {selectedCharacter.name}</h2>
+            <p>{selectedCharacter.info}</p>
+            <p>Health: {selectedCharacter.health}</p>
+            <p>Fight Score: {selectedCharacter.fightScore}</p>
+          </div>
+
+          {/* Fancy Fight Button */}
           <button className="fight-button-fancy">Fight!</button>
         </div>
       )}
@@ -97,3 +73,4 @@ function App() {
 }
 
 export default App;
+                    
