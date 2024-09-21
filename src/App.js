@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import Navbar from './Navbar';
+import { io } from "socket.io-client";
+
+const socket = io('http://localhost:5005'); // Connect to the backend server
+
 
 // Character data with real images and fight stats
 const characters = [
@@ -19,24 +23,40 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isButtonsOpen, setIsButtonsOpen] = useState(true);
-
   const [selectedCharacter, setSelectedCharacter] = useState(null);
   const [selectedButtonText, setSelectedButtonText] = useState(null); // Track the selected button text
   const [walletAddress, setWalletAddress] = useState(null);
   const [showAlert, setShowAlert] = useState(false);
-
-  const [opponentCharacter, setOpponentCharacter] = useState(null); // Add opponent character
   const [fightStarted, setFightStarted] = useState(false); // Track if the fight has started
-  const [playerHealth, setPlayerHealth] = useState(100); // Player health
-  const [opponentHealth, setOpponentHealth] = useState(100); // Opponent health
-
   const [showAnimation, setShowAnimation] = useState(true); // Track if the fight animation should show
   const [shakePlayer, setShakePlayer] = useState(false);
   const [shakeOpponent, setShakeOpponent] = useState(false);
 
-  const [isGameOver, setIsGameOver] = useState(false); // Track if game is over
-  const [winner, setWinner] = useState(null); // Track who won the game
+  const [waitingForPlayer, setWaitingForPlayer] = useState(true);
 
+  const [gameState, setGameState] = useState({
+    player1: null,
+    player2: null,
+    playerCharacter: { id: 1, name: "Warrior", info: "A powerful warrior with futuristic armor and glowing swords.", image: "https://hunterpunks.com/images/characters/10.svg", health: 100, fightScore: 90 },
+    opponentCharacter: null,
+    gameOver: false,
+    winner: null,
+  });
+
+  useEffect(() => {
+
+    // Listen for game state updates from the server
+    socket.on('gameState', (newGameState) => {
+      setGameState(newGameState);
+      if (newGameState.player2) {
+        setWaitingForPlayer(false); // Stop waiting if both players are present
+      }
+    });
+
+    return () => {
+      socket.off('gameState');
+    };
+  }, []);
 
   const handleClick = (buttonIndex) => {
     setSelectedButtonText(`${(buttonIndex + 1) * 5}$`);
@@ -51,9 +71,9 @@ function App() {
     } else {
       // Proceed with fight logic
       console.log("Fight started!");
+      socket.emit('joinGame',selectedCharacter);
       
       setFightStarted(true); // Start the fight
-      setOpponentCharacter(characters[Math.floor(Math.random() * characters.length)]); // Random opponent
       setShowAnimation(true); // Show animation
       setTimeout(() => {
         setShowAnimation(false); // Hide animation after 2 seconds
@@ -67,41 +87,11 @@ function App() {
     setIsButtonsOpen(false);
   };
 
-
-// Handle attack action for the player
 const handlePlayerAttack = () => {
-  setOpponentHealth((prevHealth) => {
-    const newHealth = Math.max(prevHealth - 10, 0);
-    if (newHealth < prevHealth) {
-      setShakeOpponent(true);
-      setTimeout(() => setShakeOpponent(false), 500); // Remove shake after 0.5s
-    }
-    return newHealth;
-  });
+  socket.emit('playerAttack');
+  setShakeOpponent(true);
+  setTimeout(() => setShakeOpponent(false), 500); 
 };
-
-const handleOpponentAttack = () => {
-  setPlayerHealth((prevHealth) => {
-    const newHealth = Math.max(prevHealth - 10, 0);
-    if (newHealth < prevHealth) {
-      setShakePlayer(true);
-      setTimeout(() => setShakePlayer(false), 500); // Remove shake after 0.5s
-    }
-    return newHealth;
-  });
-};
-
- // Detect if the game is over when health reaches 0
- useEffect(() => {
-  if (playerHealth === 0) {
-    setIsGameOver(true);
-    setWinner("Opponent");
-  } else if (opponentHealth === 0) {
-    setIsGameOver(true);
-    setWinner("Player");
-  }
-}, [playerHealth, opponentHealth]);
-
 
   const handleCloseAlert = () => {
     setShowAlert(false);  // Close the custom alert
@@ -112,10 +102,7 @@ const handleOpponentAttack = () => {
     setIsButtonsOpen(true); // Show the main screen with the buttons
     setSelectedButtonText(null); // Reset button text
     setFightStarted(false); // Reset the fight state
-    setPlayerHealth(100); // Reset health
-    setOpponentHealth(100); // Reset health
-    setIsGameOver(false); // Reset game over state
-    setWinner(null); // Reset winner
+    socket.emit('resetGame');
   };
 
   return (
@@ -191,25 +178,35 @@ const handleOpponentAttack = () => {
         </div>
       )}
 
+      {/* Waiting for player popup */}
+      {fightStarted && !showAnimation && selectedCharacter && waitingForPlayer &&(
+        <div className="custom-alert">
+          <div className="alert-content">
+            <h2>Waiting for an opponent to join...</h2>
+          </div>
+        </div>
+      )}
+
+
       {/* Game Screen */}
-      {fightStarted && !showAnimation && selectedCharacter && opponentCharacter && (
+      {fightStarted && !showAnimation && selectedCharacter && !waitingForPlayer &&(
         <div className="game-screen">
           <div className="game-characters">
             {/* Player's Character */}
             <div className={`character player`}>
               <div className={`character-content ${shakePlayer ? 'shake' : ''}`}>
-                <img src={selectedCharacter.image} alt={selectedCharacter.name} />
-                <p>{selectedCharacter.name}</p>
+                <img src={gameState.playerCharacter.image} alt={gameState.playerCharacter.name} />
+                <p>{gameState.playerCharacter.name}</p>
                 <div className="health-bar">
                   <div
                     className="health"
-                    style={{ width: `${playerHealth}%` }}
+                    style={{ width: `${gameState.playerCharacter.health}%` }}
                   ></div>
-                  <div className="health-text">{playerHealth}/100</div>
+                  <div className="health-text">{gameState.playerCharacter.health}/100</div>
                 </div>
                 <div className="action-buttons">
                   <button className="attack-button" onClick={handlePlayerAttack}>Attack</button>
-                  <button className="hide-button" onClick={() => setPlayerHealth(playerHealth)}>Hide</button>
+                  <button className="hide-button" onClick={() => {console.log("hide")}}>Hide</button>
                 </div>
               </div>
             </div>
@@ -217,19 +214,16 @@ const handleOpponentAttack = () => {
             {/* Opponent's Character */}
             <div className={`character opponent`}>
               <div className={`character-content ${shakeOpponent ? 'shake' : ''}`}>
-                <img src={opponentCharacter.image} alt={opponentCharacter.name} />
-                <p>{opponentCharacter.name}</p>
+                <img src={gameState.opponentCharacter.image} alt={gameState.opponentCharacter.name} />
+                <p>{gameState.opponentCharacter.name}</p>
                 <div className="health-bar">
                   <div
                     className="health"
-                    style={{ width: `${opponentHealth}%` }}
+                    style={{ width: `${gameState.opponentCharacter.health}%` }}
                   ></div>
-                  <div className="health-text">{opponentHealth}/100</div>
+                  <div className="health-text">{gameState.opponentCharacter.health}/100</div>
                 </div>
-                <div className="action-buttons">
-                  <button  className="attack-button" onClick={handleOpponentAttack}>Attack</button>
-                  <button  className="hide-button" onClick={() => setOpponentHealth(opponentHealth)}>Hide</button>
-                </div>
+                <div style={{ height: "155px" }}></div>
               </div>
             </div>
           </div>
@@ -237,10 +231,10 @@ const handleOpponentAttack = () => {
       )}
 
         {/* Game Over Pop-up */}
-        {isGameOver && (
+        {gameState.gameOver && (
         <div className="custom-alert">
           <div className="alert-content">
-            <h2>{winner === "Player" ? "You Win!" : "You Lose!"}</h2>
+            <h2>{gameState.winner === "Player" ? "You Win!" : "You Lose!"}</h2>
             <p>{`Selected amount: ${selectedButtonText}`}</p>
             <button onClick={handleUndoClick} className="alert-button">Play Again</button>
           </div>
