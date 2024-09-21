@@ -3,7 +3,7 @@ import "./App.css";
 import Navbar from './Navbar';
 import { io } from "socket.io-client";
 
-const socket = io('https://duel-breaker-api.onrender.com'); // Connect to the backend server
+const socket = io('https://duel-breaker-api.onrender.com/'); // Connect to the backend server
 
 
 // Character data with real images and fight stats
@@ -102,6 +102,14 @@ const handlePlayerAttack = () => {
     setIsButtonsOpen(true); // Show the main screen with the buttons
     setSelectedButtonText(null); // Reset button text
     setFightStarted(false); // Reset the fight state
+    setGameState({
+      player1: null,
+      player2: null,
+      playerCharacter: { id: 1, name: "Warrior", info: "A powerful warrior with futuristic armor and glowing swords.", image: "https://hunterpunks.com/images/characters/10.svg", health: 100, fightScore: 90 },
+      opponentCharacter: null,
+      gameOver: false,
+      winner: null,
+    });
     socket.emit('resetGame');
   };
 
@@ -171,15 +179,10 @@ const handlePlayerAttack = () => {
         </div>
       )}
 
-      {/* Fight Start Animation */}
-      {fightStarted && showAnimation && (
-        <div className="fight-animation">
-          <h1 className="fight-text">Fight!</h1>
-        </div>
-      )}
+      
 
       {/* Waiting for player popup */}
-      {fightStarted && !showAnimation && selectedCharacter && waitingForPlayer &&(
+      {fightStarted && selectedCharacter && waitingForPlayer &&(
         <div className="custom-alert">
           <div className="alert-content">
             <h2>Waiting for an opponent to join...</h2>
@@ -187,9 +190,15 @@ const handlePlayerAttack = () => {
         </div>
       )}
 
+      {/* Fight Start Animation */}
+      {fightStarted && showAnimation && !waitingForPlayer && (
+              <div className="fight-animation">
+                <h1 className="fight-text">Fight!</h1>
+              </div>
+            )}
 
-      {/* Game Screen */}
-      {fightStarted && !showAnimation && selectedCharacter && !waitingForPlayer &&(
+      {/* Game Screen for player 1*/}
+      {fightStarted && !showAnimation && selectedCharacter && !waitingForPlayer && gameState.player1 === socket.id &&(
         <div className="game-screen">
           <div className="game-characters">
             {/* Player's Character */}
@@ -222,6 +231,48 @@ const handlePlayerAttack = () => {
                     style={{ width: `${gameState.opponentCharacter.health}%` }}
                   ></div>
                   <div className="health-text">{gameState.opponentCharacter.health}/100</div>
+                </div>
+                <div style={{ height: "155px" }}></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+       {/* Game Screen for player 2*/}
+       {fightStarted && !showAnimation && selectedCharacter && !waitingForPlayer && gameState.player2 === socket.id &&(
+        <div className="game-screen">
+          <div className="game-characters">
+            {/* Player's Character */}
+            <div className={`character player`}>
+              <div className={`character-content ${shakePlayer ? 'shake' : ''}`}>
+                <img src={gameState.opponentCharacter.image} alt={gameState.opponentCharacter.name} />
+                <p>{gameState.opponentCharacter.name}</p>
+                <div className="health-bar">
+                  <div
+                    className="health"
+                    style={{ width: `${gameState.opponentCharacter.health}%` }}
+                  ></div>
+                  <div className="health-text">{gameState.opponentCharacter.health}/100</div>
+                </div>
+                <div className="action-buttons">
+                  <button className="attack-button" onClick={handlePlayerAttack}>Attack</button>
+                  <button className="hide-button" onClick={() => {console.log("hide")}}>Hide</button>
+                </div>
+              </div>
+            </div>
+
+            {/* Opponent's Character */}
+            <div className={`character opponent`}>
+              <div className={`character-content ${shakeOpponent ? 'shake' : ''}`}>
+                <img src={gameState.playerCharacter.image} alt={gameState.playerCharacter.name} />
+                <p>{gameState.playerCharacter.name}</p>
+                <div className="health-bar">
+                  <div
+                    className="health"
+                    style={{ width: `${gameState.playerCharacter.health}%` }}
+                  ></div>
+                  <div className="health-text">{gameState.playerCharacter.health}/100</div>
                 </div>
                 <div style={{ height: "155px" }}></div>
               </div>
