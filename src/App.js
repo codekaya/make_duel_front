@@ -3,7 +3,7 @@ import "./App.css";
 import Navbar from './Navbar';
 import { io } from "socket.io-client";
 
-const socket = io('https://duel-breaker-api.onrender.com/'); // Connect to the backend server
+const socket = io('http://localhost:5005/'); // Connect to the backend server
 
 
 // Character data with real images and fight stats
@@ -59,12 +59,12 @@ function App() {
   }, []);
 
   const handleClick = (buttonIndex) => {
-    setSelectedButtonText(`${(buttonIndex + 1) * 5}$`);
+    setSelectedButtonText(`${generateButtonText(buttonIndex)}`);
     setIsModalOpen(true); // Open the character selection modal
   };
 
   const handleFightClick = () => {
-    if (!walletAddress) {
+    if (!walletAddress && selectedButtonText.trim() !== "Free!") {
       console.log("olmadibe")
       setShowAlert(true); 
       
@@ -113,6 +113,27 @@ const handlePlayerAttack = () => {
     socket.emit('resetGame');
   };
 
+// Function to generate Fibonacci sequence for the buttons, starting from the 4th button
+const generateButtonText = (index) => {
+  if (index === 0) return "Free!"; // First button is "Free!"
+  if (index === 1) return "5$"; // Second button is "5$"
+  if (index === 2) return "10$"; // Third button is "10$"
+
+  // Fibonacci logic for the rest of the buttons (4th onwards)
+  let a = 5;
+  let b = 10;
+  let result = 0;
+
+  for (let i = 3; i <= index; i++) {
+    result = a + b;
+    a = b;
+    b = result;
+  }
+
+  return `${result}$`; // Return the Fibonacci number with "$" suffix
+};
+
+
   return (
     <div className="App">
       <Navbar setWalletAddress={setWalletAddress} />
@@ -120,7 +141,7 @@ const handlePlayerAttack = () => {
       {!fightStarted && (<h1 className="duel-text">Duel!</h1>)}
 
       {/* Main Screen: Button Grid */}
-      {isButtonsOpen && !fightStarted && (<div className="button-container">
+      {/* {isButtonsOpen && !fightStarted && (<div className="button-container">
         {[...Array(9)].map((_, index) => (
           <button
             key={index}
@@ -132,7 +153,23 @@ const handlePlayerAttack = () => {
             {loading ? "Loading..." : `${(index + 1) * 5}$`}
           </button>
         ))}
-      </div>)}
+      </div>)} */}
+
+      {/* Main Screen: Button Grid */}
+      {isButtonsOpen && !fightStarted && (
+        <div className="button-container">
+          {[...Array(9)].map((_, index) => (
+            <button
+              key={index}
+              className="fight-button"
+              onClick={() => handleClick(index)}
+              disabled={loading}
+            >
+              {loading ? "Loading..." : generateButtonText(index)} {/* Use Fibonacci text generator */}
+            </button>
+          ))}
+        </div>
+      )}
       
 
       {/* Modal for Character Selection */}
@@ -285,7 +322,7 @@ const handlePlayerAttack = () => {
         {gameState.gameOver && (
         <div className="custom-alert">
           <div className="alert-content">
-            <h2>{gameState.winner === "Player" ? "You Win!" : "You Lose!"}</h2>
+            <h2>{gameState.winner === socket.id ? "You Win!" : "You Lose!"}</h2>
             <p>{`Selected amount: ${selectedButtonText}`}</p>
             <button onClick={handleUndoClick} className="alert-button">Play Again</button>
           </div>
