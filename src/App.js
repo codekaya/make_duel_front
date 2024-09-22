@@ -221,13 +221,33 @@ const generateButtonText = (index) => {
       
 
       {/* Waiting for player popup */}
-      {fightStarted && selectedCharacter && waitingForPlayer &&(
+      {/* {fightStarted && selectedCharacter && waitingForPlayer &&(
         <div className="custom-alert">
           <div className="alert-content">
             <h2>Waiting for an opponent to join...</h2>
           </div>
         </div>
+      )} */}
+
+      {/* Waiting for player popup */}
+      {fightStarted && selectedCharacter && waitingForPlayer && (
+        <div className="custom-alert fancy-waiting-popup">
+          <div className="alert-content">
+            <h2>Waiting for an opponent to join...</h2>
+            <div className="loading-character"></div> {/* Character Animation */}
+            <div className="loading-spinner"></div> {/* Spinner Animation */}
+            <p className="waiting-tips">
+              Battle tip: Stay patient, victory awaits!
+            </p>
+            <div className="loading-bar">
+              <div className="loading-fill"></div>
+            </div>
+          </div>
+        </div>
       )}
+
+      
+
 
       {/* Fight Start Animation */}
       {fightStarted && !waitingForPlayer && showAnimation &&  (
