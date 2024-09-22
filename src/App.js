@@ -3,7 +3,7 @@ import "./App.css";
 import Navbar from './Navbar';
 import { io } from "socket.io-client";
 
-const socket = io('https://duel-breaker-api.onrender.com/'); // Connect to the backend server
+const socket = io('http://localhost:5005/'); // Connect to the backend server
 
 
 // Character data with real images and fight stats
@@ -49,6 +49,7 @@ function App() {
     socket.on('gameState', (newGameState) => {
       setGameState(newGameState);
       if (newGameState.player2) {
+        console.log("set waiting for plllater", waitingForPlayer)
         setWaitingForPlayer(false); // Stop waiting if both players are present
       }
     });
@@ -102,6 +103,7 @@ const handlePlayerAttack = () => {
     setIsButtonsOpen(true); // Show the main screen with the buttons
     setSelectedButtonText(null); // Reset button text
     setFightStarted(false); // Reset the fight state
+    setWaitingForPlayer(true);
     setGameState({
       player1: null,
       player2: null,
@@ -228,7 +230,7 @@ const generateButtonText = (index) => {
       )}
 
       {/* Fight Start Animation */}
-      {fightStarted && showAnimation && !waitingForPlayer && (
+      {fightStarted && !waitingForPlayer && showAnimation &&  (
               <div className="fight-animation">
                 <h1 className="fight-text">Fight!</h1>
               </div>
