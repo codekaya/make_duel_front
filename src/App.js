@@ -6,17 +6,18 @@ import { io } from "socket.io-client";
 const socket = io('https://duel-breaker-api.onrender.com'); // Connect to the backend server
 
 
+//images taken from https://hunterpunks.com/images/characters/7.svg
 // Character data with real images and fight stats
 const characters = [
-  { id: 1, name: "Warrior", info: "A powerful warrior with futuristic armor and glowing swords.", image: "https://hunterpunks.com/images/characters/10.svg", health: 100, fightScore: 90 },
-  { id: 2, name: "Ninja", info: "A fast and agile ninja, skilled in stealth and combat.", image: "https://hunterpunks.com/images/characters/1.svg", health: 80, fightScore: 95 },
-  { id: 3, name: "Sorcerer", info: "A mystical sorcerer wielding a glowing staff with powerful magic.", image: "https://hunterpunks.com/images/characters/2.svg", health: 70, fightScore: 85 },
-  { id: 4, name: "Assassin", info: "A deadly assassin who strikes from the shadows.", image: "https://hunterpunks.com/images/characters/3.svg", health: 90, fightScore: 88 },
-  { id: 5, name: "Beast", info: "A fearsome beast with immense strength and agility.", image: "https://hunterpunks.com/images/characters/4.svg", health: 120, fightScore: 80 },
-  { id: 6, name: "Robot", info: "A highly advanced robot with mechanical precision.", image: "https://hunterpunks.com/images/characters/5.svg", health: 110, fightScore: 92 },
-  { id: 7, name: "Alien", info: "An extraterrestrial being with unknown powers.", image: "https://hunterpunks.com/images/characters/6.svg", health: 85, fightScore: 93 },
-  { id: 8, name: "Pirate", info: "A cunning pirate with a thirst for adventure.", image: "https://hunterpunks.com/images/characters/7.svg", health: 95, fightScore: 84 },
-  { id: 9, name: "Samurai", info: "A disciplined samurai with a code of honor.", image: "https://hunterpunks.com/images/characters/8.svg", health: 100, fightScore: 87 }
+  { id: 1, name: "Warrior", info: "A powerful warrior with futuristic armor and glowing swords.", image: "/images/characters/1.svg", health: 100, fightScore: 90 },
+  { id: 2, name: "Ninja", info: "A fast and agile ninja, skilled in stealth and combat.", image: "/images/characters/2.svg", health: 80, fightScore: 95 },
+  { id: 3, name: "Sorcerer", info: "A mystical sorcerer wielding a glowing staff with powerful magic.", image: "/images/characters/3.svg", health: 70, fightScore: 85 },
+  { id: 4, name: "Assassin", info: "A deadly assassin who strikes from the shadows.", image: "/images/characters/4.svg", health: 90, fightScore: 88 },
+  { id: 5, name: "Beast", info: "A fearsome beast with immense strength and agility.", image: "/images/characters/5.svg", health: 120, fightScore: 80 },
+  { id: 6, name: "Robot", info: "A highly advanced robot with mechanical precision.", image: "/images/characters/6.svg", health: 110, fightScore: 92 },
+  { id: 7, name: "Alien", info: "An extraterrestrial being with unknown powers.", image: "/images/characters/7.svg", health: 85, fightScore: 93 },
+  { id: 8, name: "Pirate", info: "A cunning pirate with a thirst for adventure.", image: "/images/characters/8.svg", health: 95, fightScore: 84 },
+  { id: 9, name: "Samurai", info: "A disciplined samurai with a code of honor.", image: "/images/characters/9.svg", health: 100, fightScore: 87 }
 ];
 
 function App() {
@@ -37,7 +38,7 @@ function App() {
   const [gameState, setGameState] = useState({
     player1: null,
     player2: null,
-    playerCharacter: { id: 1, name: "Warrior", info: "A powerful warrior with futuristic armor and glowing swords.", image: "https://hunterpunks.com/images/characters/10.svg", health: 100, fightScore: 90 },
+    playerCharacter: { id: 1, name: "Warrior", info: "A powerful warrior with futuristic armor and glowing swords.", image: "/images/characters/1.svg", health: 100, fightScore: 90 },
     opponentCharacter: null,
     gameOver: false,
     winner: null,
@@ -107,7 +108,7 @@ const handlePlayerAttack = () => {
     setGameState({
       player1: null,
       player2: null,
-      playerCharacter: { id: 1, name: "Warrior", info: "A powerful warrior with futuristic armor and glowing swords.", image: "https://hunterpunks.com/images/characters/10.svg", health: 100, fightScore: 90 },
+      playerCharacter: { id: 1, name: "Warrior", info: "A powerful warrior with futuristic armor and glowing swords.", image: "/images/characters/1.svg", health: 100, fightScore: 90 },
       opponentCharacter: null,
       gameOver: false,
       winner: null,
@@ -221,27 +222,25 @@ const generateButtonText = (index) => {
       
 
       {/* Waiting for player popup */}
-      {/* {fightStarted && selectedCharacter && waitingForPlayer &&(
-        <div className="custom-alert">
-          <div className="alert-content">
-            <h2>Waiting for an opponent to join...</h2>
-          </div>
-        </div>
-      )} */}
-
-      {/* Waiting for player popup */}
       {fightStarted && selectedCharacter && waitingForPlayer && (
         <div className="custom-alert fancy-waiting-popup">
           <div className="alert-content">
             <h2>Waiting for an opponent to join...</h2>
-            <div className="loading-character"></div> {/* Character Animation */}
-            <div className="loading-spinner"></div> {/* Spinner Animation */}
-            <p className="waiting-tips">
-              Battle tip: Stay patient, victory awaits!
-            </p>
+            <div className="loading-character">
+              {selectedCharacter && (
+                <img 
+                  src={selectedCharacter.image} 
+                  alt={selectedCharacter.name}
+                />
+              )}
+            </div>
+            <div className="loading-spinner"></div>
             <div className="loading-bar">
               <div className="loading-fill"></div>
             </div>
+            <p className="waiting-tips">
+              Battle tip: Stay patient, victory awaits!
+            </p>
           </div>
         </div>
       )}
@@ -282,7 +281,11 @@ const generateButtonText = (index) => {
             {/* Opponent's Character */}
             <div className={`character opponent`}>
               <div className={`character-content ${shakeOpponent ? 'shake' : ''}`}>
-                <img src={gameState.opponentCharacter.image} alt={gameState.opponentCharacter.name} />
+                <img 
+                  src={gameState.opponentCharacter.image} 
+                  alt={gameState.opponentCharacter.name} 
+                  className="fight-character-image opponent"
+                />
                 <p>{gameState.opponentCharacter.name}</p>
                 <div className="health-bar">
                   <div
@@ -324,7 +327,11 @@ const generateButtonText = (index) => {
             {/* Opponent's Character */}
             <div className={`character opponent`}>
               <div className={`character-content ${shakeOpponent ? 'shake' : ''}`}>
-                <img src={gameState.playerCharacter.image} alt={gameState.playerCharacter.name} />
+                <img 
+                  src={gameState.playerCharacter.image} 
+                  alt={gameState.playerCharacter.name} 
+                  className="fight-character-image opponent"
+                />
                 <p>{gameState.playerCharacter.name}</p>
                 <div className="health-bar">
                   <div

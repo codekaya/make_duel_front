@@ -706,14 +706,18 @@ body {
   animation: bounceIn 1s ease-out;
 }
 
-/* Animated Character Loading */
+/* Animated Character Loading - Removing hardcoded background */
 .loading-character {
-  background: url('https://hunterpunks.com/images/characters/10.svg'); /* Example character */
-  background-size: cover;
   width: 100px;
   height: 100px;
   margin: 0 auto 15px;
   animation: jump 2s infinite ease-in-out;
+}
+
+.loading-character img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 /* Jump Animation */
@@ -860,4 +864,7 @@ body {
 
 
 /*----------------------------------------------------------------------------------------------------*/
-
+/* Add this to your CSS */
+.fight-character-image.opponent {
+  transform: scaleX(-1); /* This flips the image horizontally */
+}
