@@ -451,7 +451,7 @@ body {
   position: absolute;
   left: 50px; /* Add padding from the left side */
   top: 50%; /* Center vertically */
-  transform: translateY(-50%);
+  transform: translateY(calc(-50% + 40px));
   text-align: left;
   width: 20%;
   display: flex;
@@ -464,12 +464,12 @@ body {
   height: 300px;
 }
 
-/* Opponent's character on the right */
+/* Opponent's character on the right - adjusted position */
 .character.opponent {
   position: absolute;
   right: 50px; /* Add padding from the right side */
   top: 44%; /* Center vertically */
-  transform: translateY(-50%);
+  transform: translateY(calc(-50% - 30px)); /* Move up 30px from centered position */
   text-align: right;
   width: 20%;
   display: flex;
@@ -612,12 +612,24 @@ body {
   box-shadow: 0 5px 0 #1c7430, 0 10px 10px rgba(0, 0, 0, 0.5); /* Pressed shadow effect */
 }
 
-/* Hide button specific style */
-.action-buttons .hide-button {
+/* Hide button specific style - with higher specificity */
+.action-buttons button.hide-button {
   background-color: #dc3545; /* Red for Hide button */
   box-shadow: 0 10px 0 #a71e2b, 0 15px 15px rgba(0, 0, 0, 0.6); /* 3D shadow for Hide */
-  position: relative;
-  transform: translateX(70px); /* Move the hide button to the left */
+  transform: translate(250px, -130px) !important; /* Move the hide button to the left */
+}
+
+/* Hide button hover effect - with higher specificity */
+.action-buttons button.hide-button:hover {
+  transform: translate(250px, -135px) scale(1.1) !important; /* Keep the same X position, add slight Y movement and scale */
+  box-shadow: 0 15px 0 #a71e2b, 0 20px 25px rgba(0, 0, 0, 0.8); /* Stronger shadow for Hide */
+  background-color: #c82333; /* Darker red on hover */
+}
+
+/* Pressed effect for Hide button - with higher specificity */
+.action-buttons button.hide-button:active {
+  transform: translate(250px, -125px) scale(0.98) !important; /* Keep position, but simulate pressing down */
+  box-shadow: 0 5px 0 #a71e2b, 0 10px 10px rgba(0, 0, 0, 0.5); /* Pressed shadow effect */
 }
 
 /* Random unaligned positioning for buttons */
@@ -626,20 +638,7 @@ body {
 }
 
 .action-buttons button:nth-child(2) {
-  left: 50px; /* Move the second button more to the right */
-}
-
-/* Hide button hover effect */
-.action-buttons .hide-button:hover {
-  transform: translateX(70px)  translateY(-5px) scale(1.1);
-  box-shadow: 0 15px 0 #a71e2b, 0 20px 25px rgba(0, 0, 0, 0.8); /* Stronger shadow for Hide */
-  background-color: #c82333; /* Darker red on hover */
-}
-
-/* Pressed effect for Hide button */
-.action-buttons .hide-button:active {
-  transform: translateX(70px) translateY(5px) scale(0.98);
-  box-shadow: 0 5px 0 #a71e2b, 0 10px 10px rgba(0, 0, 0, 0.5); /* Pressed shadow effect */
+  left: -50px; /* Move the second button more to the right */
 }
 
 /* Pulsating effect for buttons */
@@ -675,6 +674,51 @@ body {
 .action-buttons .hide-button {
   animation: pulseHideButton 2s infinite alternate; /* Pulsating animation for Hide */
 }
+
+/* Pulsating effect for Dodge button using blue tones */
+@keyframes pulseDodge {
+  0% {
+    box-shadow: 0 10px 0 #0056b3, 0 15px 15px rgba(0, 123, 255, 0.5);
+  }
+  50% {
+    box-shadow: 0 15px 0 #0056b3, 0 20px 25px rgba(0, 123, 255, 0.8);
+  }
+  100% {
+    box-shadow: 0 10px 0 #0056b3, 0 15px 15px rgba(0, 123, 255, 0.5);
+  }
+}
+
+/* Dodge button specific style */
+.action-buttons .dodge-button {
+  background-color: #007bff; /* Blue background */
+  border: 4px solid #000;
+  color: white;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 2rem;
+  padding: 25px 50px;
+  border-radius: 15px;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 10px 0 #0056b3, 0 15px 15px rgba(0, 0, 0, 0.6);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
+  position: relative;
+  /* Apply the blue pulsating effect specifically */
+  animation: pulseDodge 2s infinite alternate;
+}
+
+/* Hover effect for the Dodge button */
+.action-buttons .dodge-button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+  transform: translateY(-5px);
+  box-shadow: 0 15px 0 #0056b3, 0 20px 25px rgba(0, 0, 0, 0.8);
+}
+
+/* Pressed (active) effect for the Dodge button */
+.action-buttons .dodge-button:active {
+  transform: translateY(5px);
+  box-shadow: 0 5px 0 #0056b3, 0 10px 10px rgba(0, 0, 0, 0.5);
+}
+
 
 
 /*----------------------------------------------------------------------------------------------------*/
@@ -867,4 +911,383 @@ body {
 /* Add this to your CSS */
 .fight-character-image.opponent {
   transform: scaleX(-1); /* This flips the image horizontally */
+}
+
+/* Round Timer Styling */
+.round-timer {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+}
+
+.timer-circle {
+  width: 100px;
+  height: 100px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+}
+
+.timer-fill {
+  width: 85px;
+  height: 85px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: conic-gradient(#3498db 100%, transparent 0%);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.timer-text {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 2rem;
+  color: white;
+  text-shadow: 0 0 5px #000;
+}
+
+.round-label {
+  margin-top: 10px;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 1rem;
+  color: white;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 5px 10px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 0 5px #000;
+}
+
+/* Repositioned Epic Battle Timer */
+
+/* Modified countdown number styling */
+.battle-countdown {
+  position: absolute;
+  top: calc(50% + 300px);
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Press Start 2P', cursive;
+  font-size: 6rem;
+  color: white;
+  text-shadow: 0 0 20px rgba(0, 170, 255, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 180px;
+  height: 180px;
+  z-index: 6;
+}
+
+/* Separate element for the pumping effect */
+.battle-countdown::after {
+  content: attr(data-count);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Modified pump animations that don't affect position */
+.battle-countdown.pump::after {
+  animation: scale-pump 0.3s ease-out;
+}
+
+.battle-countdown.danger::after {
+  color: #ff3b30;
+  text-shadow: 0 0 30px rgba(255, 59, 48, 0.9);
+  animation: scale-danger-pump 0.3s ease-out;
+}
+
+/* Animations that only scale without changing position */
+@keyframes scale-pump {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+@keyframes scale-danger-pump {
+  0% { 
+    transform: scale(1);
+    text-shadow: 0 0 30px rgba(255, 59, 48, 0.9);
+  }
+  50% { 
+    transform: scale(1.3);
+    text-shadow: 0 0 50px rgba(255, 59, 48, 1), 0 0 80px rgba(255, 59, 48, 0.8);
+  }
+  100% { 
+    transform: scale(1);
+    text-shadow: 0 0 30px rgba(255, 59, 48, 0.9);
+  }
+}
+
+/* Main timer bar - positioned further down */
+.battle-timer-container {
+  position: absolute;
+  top: calc(50% + 370px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 95%;
+  height: 15px; /* Increased height for visibility */
+  max-height: 15px;
+  border-radius: 8px;
+  z-index: 5;
+  overflow: visible; /* Allow for glow effects */
+  border: none !important;
+  outline: none !important;
+}
+
+/* Style the actual timer bar */
+.battle-timer-bar {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  border: none !important;
+}
+
+/* Progress bar within the timer */
+.battle-timer-progress {
+  height: 100%;
+  border-radius: 8px;
+  transition: width 0.1s linear;
+  border: none !important;
+}
+
+/* Reposition the round indicator */
+.round-indicator {
+  position: absolute;
+  top: calc(50% + 400px); /* Positioned below the timer bar */
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.5rem;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 10px 30px;
+  border-radius: 20px;
+  z-index: 5;
+  margin: 0; /* Remove any margins */
+  border: none !important;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
+}
+
+/* Remove any potential line-creating elements */
+.battle-timer-container::before,
+.battle-timer-container::after,
+.battle-timer-bar::before,
+.battle-timer-bar::after,
+.round-indicator::before,
+.round-indicator::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* Ensure no other elements are creating lines */
+.battle-timer-container *,
+.round-indicator * {
+  border: none !important;
+}
+
+/* Fix the battle countdown positioning */
+.battle-countdown {
+  position: absolute;
+  top: calc(50% + 300px);
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: none !important;
+  z-index: 6;
+}
+
+/* Create proper spacing between elements */
+.battle-countdown,
+.battle-timer-container,
+.round-indicator {
+  margin-bottom: 0 !important;
+  margin-top: 0 !important;
+}
+
+/* Timer states */
+.battle-timer-container.early .battle-timer-progress {
+  background: linear-gradient(to right, #4CAF50, #8BC34A); /* Green for early state */
+}
+
+.battle-timer-container.warning .battle-timer-progress {
+  background: linear-gradient(to right, #FFC107, #FF9800); /* Yellow/orange for warning */
+}
+
+.battle-timer-container.danger .battle-timer-progress {
+  background: linear-gradient(to right, #FF5722, #F44336); /* Red for danger */
+  animation: pulse-danger 0.5s infinite alternate;
+}
+
+@keyframes pulse-danger {
+  from { opacity: 0.8; }
+  to { opacity: 1; }
+}
+
+/* Timer glow effect */
+.timer-glow-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+/* Force the timer to be horizontal and prevent vertical line display */
+.battle-timer-container,
+.battle-timer-bar,
+.battle-timer-progress {
+  width: var(--progress, 100%);
+  height: 100%;
+  border-radius: 8px;
+  transition: width 0.1s linear;
+  border: none !important;
+}
+
+
+/* Fix for the round indicator placement */
+.round-indicator {
+  margin-top: 20px;
+  text-align: center;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: white;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+/* Updated timer effects - now red starting at 3 seconds */
+
+/* Countdown states - all danger states use red */
+.battle-countdown.warning,
+.battle-countdown.danger {
+  font-size: 7rem;
+  width: 200px;
+  height: 200px;
+  transition: all 0.3s ease;
+}
+
+/* Updated with blood-red colors for danger states */
+
+/* Deep blood-red for danger states */
+.battle-countdown.warning::after,
+.battle-countdown.danger::after {
+  color: #8B0000; /* Dark blood red */
+  text-shadow: 0 0 30px rgba(139, 0, 0, 0.9), 0 0 50px rgba(139, 0, 0, 0.8);
+}
+
+/* Enhanced blood-red effects for the last second */
+.battle-countdown.danger::after {
+  color: #A30000; /* Slightly brighter blood red for the final second */
+  text-shadow: 0 0 30px rgba(163, 0, 0, 0.9), 0 0 50px rgba(163, 0, 0, 0.8), 0 0 70px rgba(163, 0, 0, 0.6);
+  animation: blood-pulse 0.4s infinite alternate;
+}
+
+/* Glow effects updated for blood-red */
+.battle-countdown.warning ,
+.battle-countdown.danger  {
+  opacity: 1;
+  background: radial-gradient(circle, rgba(139, 0, 0, 0.7) 0%, rgba(139, 0, 0, 0) 70%);
+  animation: blood-shower-pulse 1.5s infinite alternate;
+}
+
+/* Enhanced shower effect for the final second */
+.battle-countdown.danger  {
+  background: radial-gradient(circle, rgba(163, 0, 0, 0.8) 0%, rgba(139, 0, 0, 0.4) 40%, rgba(139, 0, 0, 0) 70%);
+  animation: intense-blood-shower 0.8s infinite alternate;
+  width: 350px;
+  height: 350px;
+}
+
+/* Timer bar effects updated for blood-red */
+.battle-timer-container.warning .battle-timer-progress,
+.battle-timer-container.danger .battle-timer-progress {
+  background: linear-gradient(90deg, 
+    #600000 0%, 
+    #8B0000 50%,
+    #A30000 100%);
+  background-size: 200% 100%;
+  animation: gradient-shift 1.2s linear infinite;
+  box-shadow: 0 0 20px rgba(139, 0, 0, 0.6);
+}
+
+/* New blood-themed animations */
+@keyframes blood-pulse {
+  0% { 
+    transform: scale(1);
+    text-shadow: 0 0 30px rgba(139, 0, 0, 0.9);
+  }
+  100% { 
+    transform: scale(1.2);
+    text-shadow: 0 0 50px rgba(163, 0, 0, 1), 0 0 80px rgba(139, 0, 0, 0.8), 0 0 120px rgba(120, 0, 0, 0.5);
+  }
+}
+
+@keyframes blood-shower-pulse {
+  0% { 
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+  100% { 
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+@keyframes intense-blood-shower {
+  0% { 
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(0.95);
+    box-shadow: 0 0 50px rgba(139, 0, 0, 0.5);
+  }
+  100% { 
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.15);
+    box-shadow: 0 0 100px rgba(163, 0, 0, 0.7), 0 0 150px rgba(139, 0, 0, 0.4);
+  }
+}
+
+/* Larger shower effect */
+.countdown-shower {
+  width: 300px;
+  height: 300px;
+}
+
+.battle-countdown.danger .countdown-shower {
+  width: 350px;
+  height: 350px;
+}
+
+/* Larger warning/danger states */
+.battle-countdown.warning,
+.battle-countdown.danger {
+  font-size: 7rem;
+  width: 200px;
+  height: 200px;
+}
+
+/* Larger early state */
+.battle-countdown.early {
+  font-size: 7rem;
+  width: 200px;
+  height: 200px;
 }

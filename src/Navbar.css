@@ -3,7 +3,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.8rem 1rem;
+    padding: 0.8rem 2rem;
     position: fixed;
     top: 0;
     left: 0;
@@ -20,6 +20,7 @@
     font-size: 1.5rem;
     text-shadow: 0 0 10px #4CAF50, 0 0 20px #4CAF50;
     animation: flicker 2s infinite;
+    margin-right: 50px;
   }
   
   @keyframes flicker {
@@ -34,29 +35,34 @@
   .navbar-links {
     list-style: none;
     display: flex;
-    gap: 20px;
+    gap: 40px;
     margin: 0;
     padding: 0;
+    flex: 1;
+    justify-content: center;
   }
   
   .navbar-links li {
     display: inline;
   }
   
-  .navbar-links a {
-    color: white;
+  .navbar-links li a,
+  .navbar-links li Link {
     text-decoration: none;
-    font-size: 1rem;
+    color: white;
     transition: color 0.3s ease;
   }
   
-  .navbar-links a:hover {
-    color: #ff4b2b; /* Red hover color for fight-game intensity */
+  .navbar-links li a:hover,
+  .navbar-links li Link:hover {
+    color: #ff4b2b;
   }
   
   .wallet-button-container {
     display: flex;
     align-items: center;
+    gap: 20px;
+    margin-left: 50px;
   }
   
   .wallet-button {
@@ -73,6 +79,7 @@
     transition: transform 0.3s, box-shadow 0.3s;
   }
   
+  
   .wallet-button:hover {
     transform: scale(1.1);
     box-shadow: 0 0 30px #ff4b2b;
@@ -87,5 +94,103 @@
     font-size: 1.1rem;
     text-shadow: 0 0 8px #4CAF50, 0 0 16px #4CAF50;
     font-family: 'Press Start 2P', cursive;
+  }
+  
+  /* Simple Sound Toggle Button Styles */
+  .sound-toggle-button {
+    background-color: #4a90e2;
+    border: none;
+    color: white;
+    margin-right: 15px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(74, 144, 226, 0.4);
+  }
+  
+  .sound-toggle-button:hover {
+    background-color: #357bd8;
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(74, 144, 226, 0.6);
+  }
+  
+  .sound-toggle-button:active {
+    transform: scale(0.95);
+    background-color: #2a6dc7;
+  }
+  
+  .sound-toggle-button svg {
+    color: white;
+    width: 18px;
+    height: 18px;
+  }
+  
+  /* Elegant sound icon design */
+  .sound-icon {
+    position: relative;
+    width: 14px;
+    height: 14px;
+    background: white;
+    clip-path: polygon(0 30%, 30% 30%, 30% 70%, 0 70%);
+    display: flex;
+    align-items: center;
+  }
+  
+  /* Sound waves */
+  .sound-wave {
+    position: absolute;
+    right: -10px;
+    height: 100%;
+    width: 3px;
+    border-radius: 5px;
+  }
+  
+  .sound-wave:before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    border: 2px solid white;
+    border-left: 0;
+    border-radius: 0 50% 50% 0;
+  }
+  
+  .sound-wave:nth-child(1):before {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .sound-wave:nth-child(2):before {
+    width: 10px;
+    height: 10px;
+  }
+  
+  .sound-wave:nth-child(3):before {
+    width: 14px;
+    height: 14px;
+  }
+  
+  /* Sound off slash */
+  .sound-slash {
+    position: absolute;
+    width: 2px;
+    height: 25px;
+    background-color: white;
+    transform: rotate(45deg);
+    top: -5px;
+    right: -6px;
+  }
+  
+  /* Visibility states for waves based on sound state */
+  .sound-off .sound-wave:before {
+    display: none;
   }
   
