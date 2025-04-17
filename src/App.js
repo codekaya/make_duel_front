@@ -5,7 +5,7 @@ import { io } from "socket.io-client";
 import { Routes, Route } from 'react-router-dom';
 import HowToPlay from './pages/HowToPlay';
 
-const socket = io('https://duel-breaker-api.onrender.com'); // Connect to the backend server
+//const socket = io('http://localhost:5005'); // Connect to the backend server
 
 
 //images taken from https://hunterpunks.com/images/characters/7.svg
@@ -66,6 +66,12 @@ function App() {
   // Add the sound state at the top of your component
   const [soundEnabled, setSoundEnabled] = useState(true);
   
+  // Add the gameStats state here
+  const [gameStats, setGameStats] = useState({
+    onlinePlayers: 0,
+    activeGames: 0
+  });
+  
   // Add the effect at component level
   useEffect(() => {
     if (countdownRef.current && roundActive) {
@@ -78,6 +84,14 @@ function App() {
   // Initialize socket connection
   useEffect(() => {
     socketRef.current = io('https://duel-breaker-api.onrender.com');
+    
+    // Add gameStats listener
+    socketRef.current.on('gameStats', (stats) => {
+      setGameStats(stats);
+    });
+    
+    // Request stats immediately
+    socketRef.current.emit('requestStats');
     
     // Calculate server time offset for synchronization
     socketRef.current.on('connect', () => {
@@ -212,7 +226,10 @@ function App() {
     } else {
       // Proceed with fight logic
       console.log("Fight started!");
-      socketRef.current.emit('joinGame',selectedCharacter);
+      socketRef.current.emit('joinGame', {
+        selectedCharacter,
+        betAmount: selectedButtonText
+      });
       
       setFightStarted(true); // Start the fight
       setShowAnimation(true); // Show animation
@@ -358,7 +375,7 @@ const renderRoundTimer = () => {
       <Routes>
         <Route path="/" element={
           <div className="game-container">
-            {!fightStarted && (<h1 className="duel-text">Duel!</h1>)}
+            {!fightStarted && !selectedCharacter && (<h1 className="duel-text">Duel!</h1>)}
 
             {/* Main Screen: Button Grid */}
             {isButtonsOpen && !fightStarted && (
@@ -411,6 +428,14 @@ const renderRoundTimer = () => {
                 <p>Fight Score: {selectedCharacter.fightScore}</p>
                 <p>Defense Score: {selectedCharacter.defendScore}</p>
                 <h2 className="selected-amount">Selected: {selectedButtonText}</h2>
+                {selectedButtonText !== "Free!" && (
+                  <p className="potential-winnings">
+                    If you win, you'll receive:  
+                    <span>
+                      {(parseFloat(selectedButtonText.replace('$', '')) * 2 * 0.99).toFixed(2)}$
+                    </span>
+                  </p>
+                )}
                 <button className="fight-button-fancy" onClick={() => handleFightClick()} >Fight!</button>
 
                 {/* Undo Button inside character info */}
@@ -440,6 +465,21 @@ const renderRoundTimer = () => {
                   <div className="loading-bar">
                     <div className="loading-fill"></div>
                   </div>
+                  
+                  {/* New stats display */}
+                  <div className="game-stats">
+                    <div className="stat-item">
+                      <span className="stat-icon">👤</span>
+                      <span className="stat-value">{gameStats.onlinePlayers}</span>
+                      <span className="stat-label">Players Online</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-icon">🎮</span>
+                      <span className="stat-value">{gameStats.activeGames}</span>
+                      <span className="stat-label">Active Games</span>
+                    </div>
+                  </div>
+                  
                   <p className="waiting-tips">
                     Battle tip: Stay patient, victory awaits!
                   </p>
