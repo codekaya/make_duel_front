@@ -77,7 +77,7 @@ function App() {
   
   // Initialize socket connection
   useEffect(() => {
-    socketRef.current = io('http://localhost:5005');
+    socketRef.current = io('https://duel-breaker-api.onrender.com');
     
     // Calculate server time offset for synchronization
     socketRef.current.on('connect', () => {
