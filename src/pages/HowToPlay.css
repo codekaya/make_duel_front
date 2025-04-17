@@ -2123,3 +2123,83 @@
 }
 
 /* Game Controls Styling ending ---------------------*/
+
+/* Add these styles for the interaction matrix outcome-based coloring */
+
+/* Attack wins cells */
+.outcome-attack-wins {
+  background: rgba(255, 80, 80, 0.15);
+  border: 1px solid rgba(255, 80, 80, 0.3);
+}
+.outcome-attack-wins:hover {
+  background: rgba(255, 80, 80, 0.25);
+}
+.outcome-attack-wins p:first-child {
+  color: rgba(255, 100, 100, 1);
+  font-weight: 600;
+}
+
+/* Dodge wins cells */
+.outcome-dodge-wins {
+  background: rgba(80, 200, 120, 0.15);
+  border: 1px solid rgba(80, 200, 120, 0.3);
+}
+.outcome-dodge-wins:hover {
+  background: rgba(80, 200, 120, 0.25);
+}
+.outcome-dodge-wins p:first-child {
+  color: rgba(100, 220, 140, 1);
+  font-weight: 600;
+}
+
+/* Hide wins cells */
+.outcome-hide-wins {
+  background: rgba(70, 130, 230, 0.15);
+  border: 1px solid rgba(70, 130, 230, 0.3);
+}
+.outcome-hide-wins:hover {
+  background: rgba(70, 130, 230, 0.25);
+}
+.outcome-hide-wins p:first-child {
+  color: rgba(100, 160, 255, 1);
+  font-weight: 600;
+}
+
+/* Both deal damage cells */
+.outcome-both-damage {
+  background: rgba(255, 150, 50, 0.15);
+  border: 1px solid rgba(255, 150, 50, 0.3);
+}
+.outcome-both-damage:hover {
+  background: rgba(255, 150, 50, 0.25);
+}
+.outcome-both-damage p:first-child {
+  color: rgba(255, 170, 70, 1);
+  font-weight: 600;
+}
+
+/* Nothing happens cells */
+.outcome-nothing {
+  background: rgba(150, 150, 150, 0.15);
+  border: 1px solid rgba(150, 150, 150, 0.3);
+}
+.outcome-nothing:hover {
+  background: rgba(150, 150, 150, 0.25);
+}
+.outcome-nothing p:first-child {
+  color: rgba(180, 180, 180, 1);
+  font-weight: 600;
+}
+
+/* Both heal cells */
+.outcome-both-heal {
+  background: rgba(150, 120, 220, 0.15);
+  border: 1px solid rgba(150, 120, 220, 0.3);
+}
+.outcome-both-heal:hover {
+  background: rgba(150, 120, 220, 0.25);
+}
+.outcome-both-heal p:first-child {
+  color: rgba(180, 140, 250, 1);
+  font-weight: 600;
+}

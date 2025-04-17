@@ -194,3 +194,177 @@
     display: none;
   }
   
+  /* Mobile Menu Toggle */
+  .mobile-menu-toggle {
+    display: none; /* Hidden by default on larger screens */
+    cursor: pointer;
+    z-index: 1001;
+    padding: 10px;
+  }
+  
+  /* Hamburger icon */
+  .hamburger {
+    width: 30px;
+    height: 22px;
+    position: relative;
+  }
+  
+  .hamburger span {
+    display: block;
+    position: absolute;
+    height: 3px;
+    width: 100%;
+    background: white;
+    border-radius: 3px;
+    opacity: 1;
+    left: 0;
+    transform: rotate(0deg);
+    transition: .25s ease-in-out;
+  }
+  
+  .hamburger span:nth-child(1) {
+    top: 0px;
+  }
+  
+  .hamburger span:nth-child(2) {
+    top: 9px;
+  }
+  
+  .hamburger span:nth-child(3) {
+    top: 18px;
+  }
+  
+  /* Hamburger animation when open */
+  .hamburger.open span:nth-child(1) {
+    top: 9px;
+    transform: rotate(135deg);
+  }
+  
+  .hamburger.open span:nth-child(2) {
+    opacity: 0;
+    left: -60px;
+  }
+  
+  .hamburger.open span:nth-child(3) {
+    top: 9px;
+    transform: rotate(-135deg);
+  }
+  
+  /* Media queries for responsive design */
+  @media screen and (max-width: 992px) {
+    .navbar {
+      padding: 0.5rem 1rem;
+    }
+    
+    .navbar-links {
+      gap: 20px;
+    }
+    
+    .wallet-button-container {
+      margin-left: 20px;
+    }
+    
+    .wallet-button {
+      font-size: 0.8rem;
+      padding: 10px 15px;
+    }
+    
+    .wallet-button-container p {
+      font-size: 0.9rem;
+    }
+  }
+  
+  @media screen and (max-width: 768px) {
+    .mobile-menu-toggle {
+      display: block; /* Show on mobile */
+      order: 3; /* Place after logo but before wallet */
+    }
+    
+    .navbar {
+      justify-content: space-between;
+      padding: 0.5rem 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .navbar-logo {
+      margin-right: 0;
+      font-size: 1.2rem;
+      flex: 1;
+    }
+    
+    .navbar-links {
+      position: fixed;
+      top: 60px; /* Height of navbar */
+      left: 0;
+      width: 100%;
+      flex-direction: column;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 1rem 0;
+      gap: 20px;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      z-index: 1000;
+      border-bottom: 2px solid #4CAF50;
+    }
+    
+    .navbar-links.mobile-open {
+      max-height: 300px; /* Adjust based on content */
+    }
+    
+    .navbar-links li {
+      display: block;
+      width: 100%;
+      text-align: center;
+      padding: 10px 0;
+    }
+    
+    .wallet-button-container {
+      margin-left: 10px;
+      gap: 10px;
+      flex: 0;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+    
+    .wallet-button {
+      padding: 8px 12px;
+      font-size: 0.7rem;
+    }
+    
+    .wallet-button-container p {
+      font-size: 0.7rem;
+      max-width: 120px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .sound-toggle-button {
+      width: 30px;
+      height: 30px;
+    }
+  }
+  
+  @media screen and (max-width: 480px) {
+    .navbar-logo {
+      font-size: 1rem;
+    }
+    
+    .wallet-button {
+      padding: 6px 10px;
+      font-size: 0.6rem;
+    }
+    
+    .wallet-button-container p {
+      font-size: 0.6rem;
+      max-width: 100px;
+    }
+    
+    .sound-toggle-button {
+      width: 25px;
+      height: 25px;
+      margin-right: 5px;
+    }
+  }
+  

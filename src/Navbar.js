@@ -72,6 +72,7 @@ import { Connection, PublicKey } from '@solana/web3.js';
 
 function Navbar({ setWalletAddress, soundEnabled, setSoundEnabled, gameInProgress, onNavigate }) {
    const [walletAddress, setLocalWalletAddress] = useState(null);
+   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
    const navigate = useNavigate();
 
   // Check if Phantom is installed
@@ -104,6 +105,11 @@ function Navbar({ setWalletAddress, soundEnabled, setSoundEnabled, gameInProgres
   const toggleSound = () => {
     setSoundEnabled(!soundEnabled);
     console.log("Sound toggled:", !soundEnabled);
+  };
+
+  // Toggle mobile menu
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
   };
 
   // Check if the wallet is already connected on page load/reload
@@ -175,20 +181,34 @@ function Navbar({ setWalletAddress, soundEnabled, setSoundEnabled, gameInProgres
         Duel Breaker
       </div>
       
-      <ul className="navbar-links">
+      {/* Hamburger menu button for mobile */}
+      <div className="mobile-menu-toggle" onClick={toggleMobileMenu}>
+        <div className={`hamburger ${mobileMenuOpen ? 'open' : ''}`}>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+      
+      <ul className={`navbar-links ${mobileMenuOpen ? 'mobile-open' : ''}`}>
         <li>
           <a 
             href="#" 
             onClick={(e) => {
               e.preventDefault();
               handleNavigation('/how-to-play');
+              setMobileMenuOpen(false);
             }}
           >
             How to Play?
           </a>
         </li>
-        <li><a href="#mygames">My Games</a></li>
-        <li><a href="#contact">Contact</a></li>
+        <li>
+          <a href="#mygames" onClick={() => setMobileMenuOpen(false)}>My Games</a>
+        </li>
+        <li>
+          <a href="#contact" onClick={() => setMobileMenuOpen(false)}>Contact</a>
+        </li>
       </ul>
 
       <div className="wallet-button-container">

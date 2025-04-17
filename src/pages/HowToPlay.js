@@ -387,16 +387,16 @@ function HowToPlay() {
                       <div className="move-icon">⚔️</div>
                       <span>Attack</span>
                     </div>
-                    <div className="matrix-cell attack-attack">
+                    <div className="matrix-cell outcome-both-damage">
                       <p>Both deal damage to each other</p>
                       <p className="matrix-detail">If one predicts correctly, only their attack hits with +20% damage</p>
                     </div>
-                    <div className="matrix-cell attack-dodge superior-right">
+                    <div className="matrix-cell outcome-dodge-wins">
                       <p>Dodge wins</p>
                       <p className="matrix-detail">Attacker takes recoil damage</p>
                       <p className="matrix-detail">If attacker predicts correctly, they deal +20% damage instead</p>
                     </div>
-                    <div className="matrix-cell attack-hide superior-left">
+                    <div className="matrix-cell outcome-attack-wins">
                       <p>Attack wins</p>
                       <p className="matrix-detail">Attacker deals damage, defender heals</p>
                       <p className="matrix-detail">If attacker predicts correctly, no healing and +20% damage</p>
@@ -409,16 +409,16 @@ function HowToPlay() {
                       <div className="move-icon">💨</div>
                       <span>Dodge</span>
                     </div>
-                    <div className="matrix-cell dodge-attack superior-left">
+                    <div className="matrix-cell outcome-dodge-wins">
                       <p>Dodge wins</p>
                       <p className="matrix-detail">Attacker takes recoil damage</p>
                       <p className="matrix-detail">If attacker predicts correctly, they deal +20% damage instead</p>
                     </div>
-                    <div className="matrix-cell dodge-dodge">
+                    <div className="matrix-cell outcome-nothing">
                       <p>Nothing happens</p>
                       <p className="matrix-detail">If one predicts correctly, opponent takes damage</p>
                     </div>
-                    <div className="matrix-cell dodge-hide superior-right">
+                    <div className="matrix-cell outcome-hide-wins">
                       <p>Hide wins</p>
                       <p className="matrix-detail">Hide player heals</p>
                       <p className="matrix-detail">If Hide predicts correctly, +20% healing and Dodge player takes damage</p>
@@ -430,18 +430,18 @@ function HowToPlay() {
                       <div className="move-icon">🛡️</div>
                       <span>Hide</span>
                     </div>
-                    <div className="matrix-cell hide-attack superior-right">
+                    <div className="matrix-cell outcome-attack-wins">
                       <p>Attack wins</p>
                       <p className="matrix-detail">Attacker deals damage, defender heals</p>
                       <p className="matrix-detail">If attacker predicts correctly, no healing and +20% damage</p>
                       <p className="matrix-detail">If defender predicts correctly, no damage and +20% healing</p>
                     </div>
-                    <div className="matrix-cell hide-dodge superior-left">
+                    <div className="matrix-cell outcome-hide-wins">
                       <p>Hide wins</p>
                       <p className="matrix-detail">Hide player heals</p>
                       <p className="matrix-detail">If Hide predicts correctly, +20% healing and Dodge player takes damage</p>
                     </div>
-                    <div className="matrix-cell hide-hide">
+                    <div className="matrix-cell outcome-both-heal">
                       <p>Both players heal</p>
                       <p className="matrix-detail">If one predicts correctly, only they heal</p>
                     </div>
