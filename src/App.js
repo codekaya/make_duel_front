@@ -72,6 +72,10 @@ function App() {
     activeGames: 0
   });
   
+  // Add these state variables at the top with other state declarations
+  const [playerActiveGame, setPlayerActiveGame] = useState(null);
+  const [showActiveGameAlert, setShowActiveGameAlert] = useState(false);
+  
   // Add the effect at component level
   useEffect(() => {
     if (countdownRef.current && roundActive) {
@@ -213,28 +217,66 @@ function App() {
     }
   }, [Math.ceil(timeLeft), roundActive, soundEnabled]);
 
+  // Add this useEffect near the top of your component to check for active games on initial load
+  useEffect(() => {
+    // Only run this check if wallet is connected and socket is ready
+    if (!walletAddress || !socketRef.current) return;
+    
+    console.log("Checking for active games with wallet:", walletAddress);
+    
+    // Add a small delay to ensure socket is fully connected
+    const checkTimer = setTimeout(() => {
+      // Emit event to check for active games for this wallet
+      socketRef.current.emit('checkActiveGame', { walletAddress });
+      
+      // Set up listener for response
+      const handleActiveGameCheck = (response) => {
+        console.log("Active game check response:", response);
+        
+        if (response.hasActiveGame && response.gameSession) {
+          console.log("Found active game:", response.gameSession);
+          setPlayerActiveGame(response.gameSession);
+          setShowActiveGameAlert(true);
+        }
+      };
+      
+      socketRef.current.on('activeGameCheck', handleActiveGameCheck);
+      
+      // Cleanup function
+      return () => {
+        socketRef.current.off('activeGameCheck', handleActiveGameCheck);
+      };
+    }, 1000); // 1 second delay
+    
+    return () => clearTimeout(checkTimer);
+  }, [walletAddress, socketRef.current]);
+
   const handleClick = (buttonIndex) => {
     setSelectedButtonText(`${generateButtonText(buttonIndex)}`);
     setIsModalOpen(true); // Open the character selection modal
   };
 
   const handleFightClick = () => {
-    if (!walletAddress && selectedButtonText.trim() !== "Free!") {
-      console.log("olmadibe")
-      setShowAlert(true); 
-      
+    // For free games, we don't require a wallet but we'll pass it if available
+    const isFreeGame = selectedButtonText.trim() === "Free!";
+    
+    if (!walletAddress && !isFreeGame) {
+      console.log("Wallet required for paid games");
+      setShowAlert(true);
     } else {
       // Proceed with fight logic
       console.log("Fight started!");
       socketRef.current.emit('joinGame', {
         selectedCharacter,
-        betAmount: selectedButtonText
+        betAmount: selectedButtonText,
+        // For free games, we'll pass the wallet if available, otherwise null
+        walletAddress: walletAddress 
       });
       
-      setFightStarted(true); // Start the fight
-      setShowAnimation(true); // Show animation
+      setFightStarted(true);
+      setShowAnimation(true);
       setTimeout(() => {
-        setShowAnimation(false); // Hide animation after 2 seconds
+        setShowAnimation(false);
       }, 2000);
     }
   };
@@ -363,6 +405,82 @@ const renderRoundTimer = () => {
   );
 };
 
+// Update the handleRejoinGame function to properly handle the waiting for opponent state
+const handleRejoinGame = () => {
+  if (!playerActiveGame) return;
+  
+  setFightStarted(true);
+  setShowAnimation(true);
+  setShowActiveGameAlert(false);
+  
+  // Store the bet amount for display purposes
+  if (playerActiveGame.betAmount) {
+    setSelectedButtonText(playerActiveGame.betAmount);
+  }
+  
+  // Set player character based on wallet address
+  if (playerActiveGame.player1Wallet === walletAddress) {
+    // We are player 1
+    if (playerActiveGame.playerCharacter) {
+      setSelectedCharacter(playerActiveGame.playerCharacter);
+      
+      // Check if there's no player 2 yet - this means we're waiting for an opponent
+      if (!playerActiveGame.player2) {
+        setWaitingForPlayer(true);
+        console.log("Rejoined game that's waiting for an opponent");
+      } else {
+        setWaitingForPlayer(false);
+      }
+    }
+  } else if (playerActiveGame.player2Wallet === walletAddress) {
+    // We are player 2
+    if (playerActiveGame.opponentCharacter) {
+      setSelectedCharacter(playerActiveGame.opponentCharacter);
+      setWaitingForPlayer(false);
+    }
+  }
+  
+  // Emit the joinGame event to reconnect to the socket room
+  socketRef.current.emit('joinGame', {
+    selectedCharacter: null, // Not needed for rejoin
+    betAmount: playerActiveGame.betAmount,
+    walletAddress: walletAddress
+  });
+  
+  // Hide fight animation after delay
+  setTimeout(() => {
+    setShowAnimation(false);
+  }, 2000);
+};
+
+// Update the socket event handler to account for waiting state changes
+useEffect(() => {
+  if (!socketRef.current) return;
+  
+  // Listen for game state updates from the server
+  const handleGameState = (newGameState) => {
+    setGameState(newGameState);
+    
+    // If we're player 1 and a player 2 just joined, stop waiting
+    if (newGameState.player1 === socketRef.current.id && 
+        newGameState.player2 && 
+        waitingForPlayer) {
+      console.log("Player 2 joined, no longer waiting");
+      setWaitingForPlayer(false);
+    }
+    
+    // If we're player 2, we're never waiting for another player
+    if (newGameState.player2 === socketRef.current.id && waitingForPlayer) {
+      setWaitingForPlayer(false);
+    }
+  };
+  
+  socketRef.current.on('gameState', handleGameState);
+  
+  return () => {
+    socketRef.current.off('gameState', handleGameState);
+  };
+}, [socketRef.current, waitingForPlayer]);
 
   return (
     <div className="App">
@@ -375,6 +493,27 @@ const renderRoundTimer = () => {
       <Routes>
         <Route path="/" element={
           <div className="game-container">
+            {/* Active Game Alert */}
+            {showActiveGameAlert && playerActiveGame && (
+              <div className="custom-alert fancy-waiting-popup">
+                <div className="alert-content">
+                  <h2>You have an active game!</h2>
+                  <p>You're in the middle of a duel with bet amount: {playerActiveGame.betAmount}</p>
+                  <div className="alert-buttons">
+                    <button onClick={handleRejoinGame} className="alert-button">
+                      Rejoin Game
+                    </button>
+                    <button 
+                      onClick={() => setShowActiveGameAlert(false)} 
+                      className="alert-button secondary"
+                    >
+                      Start New Game
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {!fightStarted && !selectedCharacter && (<h1 className="duel-text">Duel!</h1>)}
 
             {/* Main Screen: Button Grid */}
@@ -466,7 +605,9 @@ const renderRoundTimer = () => {
                     <div className="loading-fill"></div>
                   </div>
                   
-                  {/* New stats display */}
+                  
+                  
+                  {/* Game stats display */}
                   <div className="game-stats">
                     <div className="stat-item">
                       <span className="stat-icon">👤</span>
