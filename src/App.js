@@ -76,7 +76,26 @@ function App() {
   const [playerActiveGame, setPlayerActiveGame] = useState(null);
   const [showActiveGameAlert, setShowActiveGameAlert] = useState(false);
   
-  // Add the effect at component level
+  // Add these state variables
+  const [roundResults, setRoundResults] = useState(null);
+  const [showRoundResults, setShowRoundResults] = useState(false);
+  
+  // Add these state variables at the top with your other state declarations
+  const [predictionMode, setPredictionMode] = useState(false);
+  const [selectedAction, setSelectedAction] = useState(null);
+  const [selectedPrediction, setSelectedPrediction] = useState(null);
+  
+  // Add these at the top with your other refs
+  const hideResultsTimeoutRef = useRef(null);
+  const lastProcessedRoundRef = useRef(null);
+  const roundLockTimeRef = useRef(null);
+  const pendingRoundRef   = useRef(null);
+
+  
+  // Add this new ref to track the current game phase
+  const gamePhaseRef = useRef('idle'); // idle, round-active, round-ending, results-display
+  
+  // Add this effect at component level
   useEffect(() => {
     if (countdownRef.current && roundActive) {
       countdownRef.current.classList.remove('pump');
@@ -87,7 +106,7 @@ function App() {
   
   // Initialize socket connection
   useEffect(() => {
-    socketRef.current = io('https://duel-breaker-api.onrender.com');
+    socketRef.current = io('http://localhost:5005');
     
     // Add gameStats listener
     socketRef.current.on('gameStats', (stats) => {
@@ -112,55 +131,140 @@ function App() {
     });
     
     // Handle round start
-    socketRef.current.on('roundStart', (data) => {
-      setCurrentRound(data.round);
-      setActionTaken(false);
-      setRoundActive(true);
+    socketRef.current.on('roundStart', data => {
+            // ignore duplicates or old rounds
+          if (data.round <= currentRound) return;
       
-      // Calculate when the round will end in client time
-      const serverStartTime = data.startTime;
-      const clientStartTime = serverStartTime - serverTimeOffset;
-      const endTime = clientStartTime + data.duration;
-      setRoundEndTime(endTime);
+            // if we're not idle (still showing results or ending), hold this data
+            if (gamePhaseRef.current !== 'idle') {
+              pendingRoundRef.current = data;
+              return;
+            }
       
-      // Start the synchronized timer
-      startSynchronizedTimer(endTime);
-    });
-    
+            // otherwise start the round immediately
+      processRoundStart(data);
+      });
     // Handle round end
     socketRef.current.on('roundEnd', (data) => {
-      setRoundActive(false);
-      // Update game state with round results
-      setGameState(prevState => ({
-        ...prevState,
-        playerCharacter: {
-          ...prevState.playerCharacter,
-          health: data.player1Health
-        },
-        opponentCharacter: {
-          ...prevState.opponentCharacter,
-          health: data.player2Health
-        },
-        gameOver: data.gameOver,
-        winner: data.winner
-      }));
+      console.log("Round End Data:", data);
       
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
+      // Implement a strict round processing order
+      if (lastProcessedRoundRef.current !== null && data.round <= lastProcessedRoundRef.current) {
+        console.log(`Ignoring out-of-sequence round data for round ${data.round}`);
+        return;
       }
+      
+      // Only process round end if we're in an active round or waiting for results
+      if (gamePhaseRef.current !== 'round-active' && gamePhaseRef.current !== 'round-ending') {
+        console.log(`Ignoring round end event during ${gamePhaseRef.current} phase`);
+        return;
+      }
+      
+      // Set phase to round-ending
+      gamePhaseRef.current = 'round-ending';
+      
+      // Update our tracked round
+      lastProcessedRoundRef.current = data.round;
+      
+      // Update the local gameState directly 
+      setGameState(prevState => {
+        // Create a deep copy to ensure React detects changes
+        const newState = JSON.parse(JSON.stringify(prevState));
+        
+        // Update health directly based on round results
+        if (socketRef.current.id === prevState.player1) {
+          // We are player 1
+          newState.playerCharacter.health = Math.max(0, data.player1Health);
+          newState.opponentCharacter.health = Math.max(0, data.player2Health);
+        } else {
+          // We are player 2
+          newState.playerCharacter.health = Math.max(0, data.player2Health);
+          newState.opponentCharacter.health = Math.max(0, data.player1Health);
+        }
+        
+        // Update game over status from round end data
+        if (data.gameOver) {
+          console.log("Game over detected in roundEnd event:", data);
+          newState.gameOver = true;
+          newState.winner = data.winner;
+        }
+        
+        return newState;
+      });
+      
+      // Set round results for display
+      setRoundResults(data);
+      
+      // Clear any existing timeout to avoid multiple popups
+      if (hideResultsTimeoutRef.current) {
+        clearTimeout(hideResultsTimeoutRef.current);
+      }
+      
+      // Set round inactive immediately to stop the timer
+      setRoundActive(false);
+      
+      // Set phase to results-display
+      gamePhaseRef.current = 'results-display';
+      
+      // Show the results
+      setShowRoundResults(true);
+      
+      // Lock the round display for 9 seconds (almost the full display time)
+      roundLockTimeRef.current = Date.now() + 10000;
+      
+      // Visual effects for damage
+      if (socketRef.current.id === gameState.player1) {
+        if (data.player1.damageTaken > 0) {
+          setShakePlayer(true);
+          setTimeout(() => setShakePlayer(false), 500);
+        }
+        if (data.player2.damageTaken > 0) {
+          setShakeOpponent(true);
+          setTimeout(() => setShakeOpponent(false), 500);
+        }
+      } else {
+        if (data.player2.damageTaken > 0) {
+          setShakePlayer(true);
+          setTimeout(() => setShakePlayer(false), 500);
+        }
+        if (data.player1.damageTaken > 0) {
+          setShakeOpponent(true);
+          setTimeout(() => setShakeOpponent(false), 500);
+        }
+      }
+      
+      // Set timeout to hide results after 10 seconds
+      hideResultsTimeoutRef.current = setTimeout(() => {
+        setShowRoundResults(false);
+        hideResultsTimeoutRef.current = null;
+        roundLockTimeRef.current = null;
+        gamePhaseRef.current = 'idle';
+        // if a roundStart came in while we were showing results, start it now:
+        if (pendingRoundRef.current) {
+          processRoundStart(pendingRoundRef.current);
+          pendingRoundRef.current = null;
+        }
+      }, 10000);
     });
     
     // Handle action confirmation
     socketRef.current.on('actionConfirmed', (data) => {
-      setActionTaken(true);
+      console.log('Action confirmed:', data);
+      // Show some confirmation to the player
     });
     
     // Listen for game state updates from the server
-    socketRef.current.on('gameState', (newGameState) => {
-      setGameState(newGameState);
-      if (newGameState.player2) {
-        console.log("set waiting for plllater", waitingForPlayer)
-        setWaitingForPlayer(false); // Stop waiting if both players are present
+    socketRef.current.on('gameState', (newState) => {
+      console.log("Game State Update:", newState);
+      
+      // Update entire game state including health values
+      setGameState(prevState => {
+        // When we receive a game state update, fully replace our state
+        return { ...newState };
+      });
+      
+      if (newState.player2) {
+        setWaitingForPlayer(false);
       }
     });
 
@@ -287,22 +391,23 @@ function App() {
     setIsButtonsOpen(false);
   };
 
-const handlePlayerAttack = () => {
-  socketRef.current.emit('playerAttack');
-  setShakeOpponent(true);
-  setTimeout(() => setShakeOpponent(false), 500); 
-};
+const handlePlayerAttack = () => handlePlayerAction('attack');
+const handlePlayerDodge = () => handlePlayerAction('dodge');
+const handlePlayerHide = () => handlePlayerAction('hide');
 
   const handleCloseAlert = () => {
     setShowAlert(false);  // Close the custom alert
   };
 
   const handleUndoClick = () => {
+    // Reset basic game state
     setSelectedCharacter(null);
-    setIsButtonsOpen(true); // Show the main screen with the buttons
-    setSelectedButtonText(null); // Reset button text
-    setFightStarted(false); // Reset the fight state
+    setIsButtonsOpen(true); 
+    setSelectedButtonText(null);
+    setFightStarted(false);
     setWaitingForPlayer(true);
+    
+    // Reset game state
     setGameState({
       player1: null,
       player2: null,
@@ -311,6 +416,43 @@ const handlePlayerAttack = () => {
       gameOver: false,
       winner: null,
     });
+    
+    // Reset round-related state
+    setCurrentRound(0);
+    setTimeLeft(0);
+    setActionTaken(false);
+    setRoundActive(false);
+    setRoundEndTime(0);
+    
+    // Reset round results state
+    setRoundResults(null);
+    setShowRoundResults(false);
+    
+    // Reset action state
+    setPredictionMode(false);
+    setSelectedAction(null);
+    setSelectedPrediction(null);
+    
+    // Reset refs
+    lastProcessedRoundRef.current = null;
+    roundLockTimeRef.current = null;
+    pendingRoundRef.current = null;
+    
+    // Reset game phase
+    gamePhaseRef.current = 'idle';
+    
+    // Clear any existing timers
+    if (hideResultsTimeoutRef.current) {
+      clearTimeout(hideResultsTimeoutRef.current);
+      hideResultsTimeoutRef.current = null;
+    }
+    
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    
+    // Tell the server to reset
     socketRef.current.emit('resetGame');
   };
 
@@ -352,13 +494,16 @@ const startSynchronizedTimer = (endTime) => {
     
     if (secondsLeft <= 0) {
       // Timer reached zero
+      if (gamePhaseRef.current === 'round-active') {
+        gamePhaseRef.current = 'round-ending';
+      }
       setRoundActive(false);
       clearInterval(timerRef.current);
     }
   }, 100); // Update 10 times per second for smooth countdown
 };
 
-// Render epic battle timer
+// Update the renderRoundTimer function to handle zero values better
 const renderRoundTimer = () => {
   // Calculate percentage for timer display
   const duration = 10; // 10 seconds per round
@@ -372,6 +517,9 @@ const renderRoundTimer = () => {
     timerState = timeLeft <= 1 ? 'danger' : 'warning';
   }
   
+  // For debugging
+  //console.log(`Rendering timer: ${timeLeft} seconds left, ${percentage}% remaining`);
+  
   return (
     <>
       {/* Large countdown number between characters with shower effect */}
@@ -380,8 +528,6 @@ const renderRoundTimer = () => {
         className={`battle-countdown ${timerState}`}
         data-count={Math.ceil(timeLeft)}
       >
-      
-        
         {/* Actual text hidden but still accessible */}
         <span style={{ opacity: 0 }}>{Math.ceil(timeLeft)}</span>
       </div>
@@ -403,6 +549,64 @@ const renderRoundTimer = () => {
       <div className="round-indicator">ROUND {currentRound}</div>
     </>
   );
+};
+
+// Update the timer initialization in processRoundStart
+const processRoundStart = (data) => {
+  // Update game phase
+  gamePhaseRef.current = 'round-active';
+  
+  // Hide any existing round results
+  setShowRoundResults(false);
+  
+  // Clear any existing timeout
+  if (hideResultsTimeoutRef.current) {
+    clearTimeout(hideResultsTimeoutRef.current);
+    hideResultsTimeoutRef.current = null;
+  }
+  
+  console.log("Processing round start with data:", data);
+  
+  // Make sure we have the required time data
+  if (data.endTime) {
+    // Parse the endTime correctly (ensure it's a number)
+    const endTimeMillis = typeof data.endTime === 'string' 
+      ? Date.parse(data.endTime) 
+      : data.endTime;
+    
+    // Store as a number
+    setRoundEndTime(endTimeMillis);
+    
+    // Calculate initial time left
+    const now = Date.now();
+    const initialTimeLeft = Math.max(0, (endTimeMillis - now) / 1000);
+    
+    console.log(`Round ${data.round} starting with ${initialTimeLeft}s remaining`);
+    console.log(`End time: ${new Date(endTimeMillis).toISOString()}, Now: ${new Date(now).toISOString()}`);
+    
+    // Set time immediately
+    setTimeLeft(initialTimeLeft);
+    
+    // Start synchronized timer
+    startSynchronizedTimer(endTimeMillis);
+  } else {
+    console.error("Missing endTime in round start data", data);
+    // Default to 10 seconds if no end time provided
+    setTimeLeft(10);
+    setRoundEndTime(Date.now() + 10000);
+    startSynchronizedTimer(Date.now() + 10000);
+  }
+  
+  // Normal round start handling
+  setCurrentRound(data.round);
+  setRoundActive(true);
+  setActionTaken(false);
+  setPredictionMode(false);
+  setSelectedAction(null);
+  setSelectedPrediction(null);
+  
+  // Release any locks
+  roundLockTimeRef.current = null;
 };
 
 // Update the handleRejoinGame function to properly handle the waiting for opponent state
@@ -481,6 +685,112 @@ useEffect(() => {
     socketRef.current.off('gameState', handleGameState);
   };
 }, [socketRef.current, waitingForPlayer]);
+
+// Add this component for showing round results
+const RoundResults = () => {
+  if (!showRoundResults || !roundResults) return null;
+  
+  const isPlayer1 = socketRef.current.id === gameState.player1;
+  const playerData = isPlayer1 ? roundResults.player1 : roundResults.player2;
+  const opponentData = isPlayer1 ? roundResults.player2 : roundResults.player1;
+  
+  // Calculate total damage/healing for emphasis
+  const playerNetChange = playerData.healingReceived - playerData.damageTaken;
+  const opponentNetChange = opponentData.healingReceived - opponentData.damageTaken;
+  
+  // Determine result message
+  let resultMessage = "Round Complete";
+  if (playerNetChange > opponentNetChange) {
+    resultMessage = "You Won This Round!";
+  } else if (playerNetChange < opponentNetChange) {
+    resultMessage = "You Lost This Round";
+  } else {
+    resultMessage = "Round Draw";
+  }
+  
+  return (
+    <div className="round-results">
+      <div className="round-results-header">
+        <h3>Round {roundResults.round} Results</h3>
+        <h2 className={playerNetChange > 0 ? "positive-result" : playerNetChange < 0 ? "negative-result" : ""}>{resultMessage}</h2>
+      </div>
+      <div className="round-results-content">
+        <div className="player-result">
+          <h4>Your Move</h4>
+          <p className="move-result">Action: <span className="highlight">{playerData.action || "None"}</span></p>
+          <p className="move-result">Prediction: <span className="highlight">{playerData.prediction || "None"}</span></p>
+          <p className="damage-result">Damage Taken: <span className="damage">{playerData.damageTaken}</span></p>
+          <p className="healing-result">Healing: <span className="healing">{playerData.healingReceived}</span></p>
+          <p className="net-result">Net: <span className={playerNetChange >= 0 ? "healing" : "damage"}>{playerNetChange}</span></p>
+        </div>
+        <div className="opponent-result">
+          <h4>Opponent's Move</h4>
+          <p className="move-result">Action: <span className="highlight">{opponentData.action || "None"}</span></p>
+          <p className="move-result">Prediction: <span className="highlight">{opponentData.prediction || "None"}</span></p>
+          <p className="damage-result">Damage Taken: <span className="damage">{opponentData.damageTaken}</span></p>
+          <p className="healing-result">Healing: <span className="healing">{opponentData.healingReceived}</span></p>
+          <p className="net-result">Net: <span className={opponentNetChange >= 0 ? "healing" : "damage"}>{opponentNetChange}</span></p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Add this function to handle all player actions
+const handlePlayerAction = (action) => {
+  if (gamePhaseRef.current !== 'round-active' || actionTaken) return;
+  
+  if (!predictionMode) {
+    // First, handle prediction selection
+    setSelectedPrediction(action);
+    setPredictionMode(true);
+  } else {
+    // Then handle action selection
+    setSelectedAction(action);
+    setPredictionMode(false);
+    
+    // Send both to the server
+    socketRef.current.emit('playerAction', {
+      action: action,
+      prediction: selectedPrediction
+    });
+    
+    setActionTaken(true);
+  }
+};
+
+// Add this component to show the current mode
+const GameModeIndicator = () => {
+  if (!roundActive || actionTaken) return null;
+  
+  return (
+    <div className="game-mode-indicator">
+      {predictionMode ? (
+        <div className="mode action-mode">
+          <h3>Select Your Action</h3>
+        </div>
+      ) : (
+        <div className="mode prediction-mode">
+          <h3>Predict Opponent's Move</h3>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Clean up timeouts when component unmounts
+useEffect(() => {
+  return () => {
+    if (hideResultsTimeoutRef.current) {
+      clearTimeout(hideResultsTimeoutRef.current);
+    }
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    // Reset game phase
+    gamePhaseRef.current = 'idle';
+  };
+}, []);
 
   return (
     <div className="App">
@@ -654,10 +964,31 @@ useEffect(() => {
                         ></div>
                         <div className="health-text">{gameState.playerCharacter.health}/100</div>
                       </div>
+                      {roundActive && !actionTaken && (
+                        <GameModeIndicator />
+                      )}
                       <div className="action-buttons">
-                        <button className="attack-button" onClick={handlePlayerAttack}>Attack</button>
-                        <button className="dodge-button" onClick={() => console.log("dodge")}>Dodge</button>
-                        <button className="hide-button" onClick={() => {console.log("hide")}}>Hide</button>
+                        <button 
+                          className="attack-button" 
+                          onClick={handlePlayerAttack}
+                          disabled={!roundActive || actionTaken}
+                        >
+                          Attack
+                        </button>
+                        <button 
+                          className="dodge-button" 
+                          onClick={handlePlayerDodge}
+                          disabled={!roundActive || actionTaken}
+                        >
+                          Dodge
+                        </button>
+                        <button 
+                          className="hide-button" 
+                          onClick={handlePlayerHide}
+                          disabled={!roundActive || actionTaken}
+                        >
+                          Hide
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -682,6 +1013,7 @@ useEffect(() => {
                     </div>
                   </div>
                 </div>
+                <RoundResults />
               </div>
             )}
 
@@ -697,14 +1029,35 @@ useEffect(() => {
                       <div className="health-bar">
                         <div
                           className="health"
-                          style={{ width: `${gameState.opponentCharacter.health}%` }}
+                          style={{ width: `${gameState.playerCharacter.health}%` }}
                         ></div>
-                        <div className="health-text">{gameState.opponentCharacter.health}/100</div>
+                        <div className="health-text">{gameState.playerCharacter.health}/100</div>
                       </div>
+                      {roundActive && !actionTaken && (
+                        <GameModeIndicator />
+                      )}
                       <div className="action-buttons">
-                        <button className="attack-button" onClick={handlePlayerAttack}>Attack</button>
-                        <button className="dodge-button" onClick={() => console.log("dodge")}>Dodge</button>
-                        <button className="hide-button" onClick={() => {console.log("hide")}}>Hide</button>
+                        <button 
+                          className="attack-button" 
+                          onClick={handlePlayerAttack}
+                          disabled={!roundActive || actionTaken}
+                        >
+                          Attack
+                        </button>
+                        <button 
+                          className="dodge-button" 
+                          onClick={handlePlayerDodge}
+                          disabled={!roundActive || actionTaken}
+                        >
+                          Dodge
+                        </button>
+                        <button 
+                          className="hide-button" 
+                          onClick={handlePlayerHide}
+                          disabled={!roundActive || actionTaken}
+                        >
+                          Hide
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -721,14 +1074,15 @@ useEffect(() => {
                       <div className="health-bar">
                         <div
                           className="health"
-                          style={{ width: `${gameState.playerCharacter.health}%` }}
+                          style={{ width: `${gameState.opponentCharacter.health}%` }}
                         ></div>
-                        <div className="health-text">{gameState.playerCharacter.health}/100</div>
+                        <div className="health-text">{gameState.opponentCharacter.health}/100</div>
                       </div>
                       <div style={{ height: "155px" }}></div>
                     </div>
                   </div>
                 </div>
+                <RoundResults />
               </div>
             )}
 

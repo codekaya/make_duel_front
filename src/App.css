@@ -602,7 +602,7 @@ body {
 /* Attack button hover effect */
 .action-buttons button:hover {
   transform: translateY(-5px); /* Slight 3D lift on hover */
-  box-shadow: 0 15px 0 #1c7430, 0 20px 25px rgba(0, 0, 0, 0.8); /* Stronger 3D shadow on hover */
+  box-shadow: 0 15px 0 #1c7430, 0 20px 25px rgba(0, 255, 0, 0.8); /* Stronger 3D shadow on hover */
   background-color: #218838; /* Darker green on hover */
 }
 
@@ -1362,5 +1362,169 @@ body {
   margin-top: 2px;
   color: #777;
   text-align: center;
+}
+
+/* Enhanced Round Results Styling */
+.round-results {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.8);
+  padding: 20px;
+  border-radius: 10px;
+  z-index: 100;
+  width: 95%;
+  max-width: 850px;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+  color: white;
+  height: auto;
+  box-sizing: border-box;
+}
+
+.round-results.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.round-results.visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.round-results-header {
+  text-align: center;
+  margin-bottom: 20px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 15px;
+}
+
+.round-results-header h3 {
+  font-size: 1.8rem;
+  margin: 0 0 10px 0;
+  color: #4CAF50;
+  text-shadow: 0 0 10px rgba(76, 175, 80, 0.8);
+}
+
+.round-results-header h2 {
+  font-size: 2.2rem;
+  margin: 10px 0 0 0;
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+  color: #FFD700;
+}
+
+.positive-result {
+  color: #4CAF50 !important;
+  text-shadow: 0 0 15px rgba(76, 175, 80, 0.8) !important;
+}
+
+.negative-result {
+  color: #FF5252 !important;
+  text-shadow: 0 0 15px rgba(255, 82, 82, 0.8) !important;
+}
+
+.round-results-content {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  width: 100%;
+}
+
+.player-result, .opponent-result {
+  flex: 1;
+  padding: 15px;
+  background: rgba(30, 30, 55, 0.8);
+  border-radius: 10px;
+  border: 1px solid rgba(100, 100, 240, 0.3);
+  min-width: 0;
+}
+
+.player-result h4, .opponent-result h4 {
+  margin: 0 0 15px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  text-align: center;
+  font-size: 1.4rem;
+}
+
+.player-result p, .opponent-result p {
+  margin: 12px 0;
+  font-size: 1.1rem;
+  line-height: 1.5;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.move-result, .damage-result, .healing-result, .net-result {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.highlight {
+  color: #FFD700;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.damage {
+  color: #FF5252;
+  font-weight: bold;
+}
+
+.healing {
+  color: #4CAF50;
+  font-weight: bold;
+}
+
+/* Make health bar changes more visible with transition */
+.health-bar .health {
+  transition: width 0.5s ease-in-out;
+}
+
+/* Add a glow effect to health bars when they change */
+@keyframes healthBarGlow {
+  0% { box-shadow: 0 0 5px rgba(76, 175, 80, 0.5); }
+  50% { box-shadow: 0 0 20px rgba(76, 175, 80, 0.8); }
+  100% { box-shadow: 0 0 5px rgba(76, 175, 80, 0.5); }
+}
+
+.health-bar {
+  animation: healthBarGlow 1s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Game mode indicator */
+.game-mode-indicator {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.7);
+  padding: 10px 20px;
+  border-radius: 10px;
+  z-index: 10;
+  text-align: center;
+}
+
+.mode h3 {
+  color: white;
+  font-size: 1.5rem;
+  margin: 0;
+  padding: 0;
+}
+
+.prediction-mode h3 {
+  color: #4CAF50;
+  text-shadow: 0 0 10px rgba(76, 175, 80, 0.8);
+}
+
+.action-mode h3 {
+  color: #ff416c;
+  text-shadow: 0 0 10px rgba(255, 65, 108, 0.8);
 }
 
