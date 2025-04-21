@@ -20,13 +20,13 @@ function HowToPlay() {
   // Character data
   const characters = [
     { id: 1, name: "Warrior", info: "A powerful warrior with futuristic armor and glowing swords.", image: "/images/characters/1.svg", health: 100, fightScore: 70, defendScore: 30 },
-    { id: 2, name: "Ninja", info: "A fast and agile ninja, skilled in stealth and combat.", image: "/images/characters/2.svg", health: 100, fightScore: 80, defendScore: 20 },
-    { id: 3, name: "Sorcerer", info: "A mystical sorcerer wielding a glowing staff with powerful magic.", image: "/images/characters/3.svg", health: 100, fightScore: 75, defendScore: 25 },
-    { id: 4, name: "Assassin", info: "A deadly assassin who strikes from the shadows.", image: "/images/characters/4.svg", health: 100, fightScore: 85, defendScore: 15 },
-    { id: 5, name: "Beast", info: "A fearsome beast with immense strength and agility.", image: "/images/characters/5.svg", health: 100, fightScore: 65, defendScore: 35 },
-    { id: 6, name: "Robot", info: "A highly advanced robot with mechanical precision.", image: "/images/characters/6.svg", health: 100, fightScore: 60, defendScore: 40 },
+    { id: 2, name: "Will", info: "A fast and agile ninja, skilled in stealth and combat.", image: "/images/characters/2.svg", health: 100, fightScore: 80, defendScore: 20 },
+    { id: 3, name: "Zombie", info: "A mystical sorcerer wielding a glowing staff with powerful magic.", image: "/images/characters/3.svg", health: 100, fightScore: 75, defendScore: 25 },
+    { id: 4, name: "Ghost", info: "A deadly assassin who strikes from the shadows.", image: "/images/characters/4.svg", health: 100, fightScore: 85, defendScore: 15 },
+    { id: 5, name: "Plumber", info: "A fearsome beast with immense strength and agility.", image: "/images/characters/5.svg", health: 100, fightScore: 65, defendScore: 35 },
+    { id: 6, name: "Chef", info: "A highly advanced robot with mechanical precision.", image: "/images/characters/6.svg", health: 100, fightScore: 60, defendScore: 40 },
     { id: 7, name: "Alien", info: "An extraterrestrial being with unknown powers.", image: "/images/characters/7.svg", health: 100, fightScore: 50, defendScore: 50 },
-    { id: 8, name: "Pirate", info: "A cunning pirate with a thirst for adventure.", image: "/images/characters/8.svg", health: 100, fightScore: 45, defendScore: 55 },
+    { id: 8, name: "Soldier", info: "A cunning pirate with a thirst for adventure.", image: "/images/characters/8.svg", health: 100, fightScore: 45, defendScore: 55 },
     { id: 9, name: "Samurai", info: "A disciplined samurai with a code of honor.", image: "/images/characters/9.svg", health: 100, fightScore: 55, defendScore: 45 }
   ];
   

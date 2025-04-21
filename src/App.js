@@ -4,6 +4,11 @@ import Navbar from './Navbar';
 import { io } from "socket.io-client";
 import { Routes, Route } from 'react-router-dom';
 import HowToPlay from './pages/HowToPlay';
+import * as solanaWeb3 from '@solana/web3.js';
+import { Buffer } from 'buffer';
+
+// Make Buffer available globally (this is the key fix)
+window.Buffer = Buffer;
 
 //const socket = io('http://localhost:5005'); // Connect to the backend server
 
@@ -12,13 +17,13 @@ import HowToPlay from './pages/HowToPlay';
 // Character data with real images and fight stats
 const characters = [
   { id: 1, name: "Warrior", info: "A powerful warrior with futuristic armor and glowing swords.", image: "/images/characters/1.svg", health: 100, fightScore: 70, defendScore: 30 },
-  { id: 2, name: "Ninja", info: "A fast and agile ninja, skilled in stealth and combat.", image: "/images/characters/2.svg", health: 100, fightScore: 80, defendScore: 20 },
-  { id: 3, name: "Sorcerer", info: "A mystical sorcerer wielding a glowing staff with powerful magic.", image: "/images/characters/3.svg", health: 100, fightScore: 75, defendScore: 25 },
-  { id: 4, name: "Assassin", info: "A deadly assassin who strikes from the shadows.", image: "/images/characters/4.svg", health: 100, fightScore: 85, defendScore: 15 },
-  { id: 5, name: "Beast", info: "A fearsome beast with immense strength and agility.", image: "/images/characters/5.svg", health: 100, fightScore: 65, defendScore: 35 },
-  { id: 6, name: "Robot", info: "A highly advanced robot with mechanical precision.", image: "/images/characters/6.svg", health: 100, fightScore: 60, defendScore: 40 },
+  { id: 2, name: "Will", info: "A fast and agile ninja, skilled in stealth and combat.", image: "/images/characters/2.svg", health: 100, fightScore: 80, defendScore: 20 },
+  { id: 3, name: "Zombie", info: "A mystical sorcerer wielding a glowing staff with powerful magic.", image: "/images/characters/3.svg", health: 100, fightScore: 75, defendScore: 25 },
+  { id: 4, name: "Ghost", info: "A deadly assassin who strikes from the shadows.", image: "/images/characters/4.svg", health: 100, fightScore: 85, defendScore: 15 },
+  { id: 5, name: "Plumber", info: "A fearsome beast with immense strength and agility.", image: "/images/characters/5.svg", health: 100, fightScore: 65, defendScore: 35 },
+  { id: 6, name: "Chef", info: "A highly advanced robot with mechanical precision.", image: "/images/characters/6.svg", health: 100, fightScore: 60, defendScore: 40 },
   { id: 7, name: "Alien", info: "An extraterrestrial being with unknown powers.", image: "/images/characters/7.svg", health: 100, fightScore: 50, defendScore: 50 },
-  { id: 8, name: "Pirate", info: "A cunning pirate with a thirst for adventure.", image: "/images/characters/8.svg", health: 100, fightScore: 45, defendScore: 55 },
+  { id: 8, name: "Soldier", info: "A cunning pirate with a thirst for adventure.", image: "/images/characters/8.svg", health: 100, fightScore: 45, defendScore: 55 },
   { id: 9, name: "Samurai", info: "A disciplined samurai with a code of honor.", image: "/images/characters/9.svg", health: 100, fightScore: 55, defendScore: 45 }
 ];
 
@@ -106,7 +111,7 @@ function App() {
   
   // Initialize socket connection
   useEffect(() => {
-    socketRef.current = io('https://duel-breaker-api.onrender.com');
+    socketRef.current = io('http://localhost:5005');
     
     // Add gameStats listener
     socketRef.current.on('gameStats', (stats) => {
@@ -355,34 +360,248 @@ function App() {
     return () => clearTimeout(checkTimer);
   }, [walletAddress, socketRef.current]);
 
+  // Add this useEffect to check for active games when the component mounts
+  useEffect(() => {
+    // Function to check for active games
+    const checkForActiveGames = async () => {
+      // Only check if wallet is connected
+      if (!walletAddress) return;
+      
+      try {
+        console.log('Checking for active games with wallet:', walletAddress);
+        
+        // Emit event to check for active games
+        socketRef.current.emit('checkActiveGames', { walletAddress });
+        
+        // Wait for response
+        const result = await new Promise((resolve, reject) => {
+          socketRef.current.once('activeGameResult', (data) => resolve(data));
+          setTimeout(() => reject(new Error('Request timeout')), 5000);
+        });
+        
+        console.log('Active game check result:', result);
+        
+        // If there's an active game, show the alert
+        if (result.hasActiveGame && result.gameData) {
+          setPlayerActiveGame(result.gameData);
+          setShowActiveGameAlert(true);
+        }
+      } catch (error) {
+        console.error('Error checking for active games:', error);
+      }
+    };
+    
+    // Check for active games when component mounts
+    if (socketRef.current && walletAddress) {
+      checkForActiveGames();
+    }
+    
+    // Also set up listener for wallet changes
+    const handleWalletChange = () => {
+      if (socketRef.current && walletAddress) {
+        checkForActiveGames();
+      }
+    };
+    
+    // Call on wallet change
+    window.addEventListener('walletChange', handleWalletChange);
+    
+    return () => {
+      window.removeEventListener('walletChange', handleWalletChange);
+    };
+  }, [walletAddress, socketRef.current]);
+
   const handleClick = (buttonIndex) => {
     setSelectedButtonText(`${generateButtonText(buttonIndex)}`);
     setIsModalOpen(true); // Open the character selection modal
   };
 
-  const handleFightClick = () => {
-    // For free games, we don't require a wallet but we'll pass it if available
-    const isFreeGame = selectedButtonText.trim() === "Free!";
+  // Add this state to your component's state
+  const [showTransactionWaiting, setShowTransactionWaiting] = useState(false);
+  const [transactionStatus, setTransactionStatus] = useState('Initiating payment...');
+
+  // Add these state variables to your existing state
+  const [transactionSignature, setTransactionSignature] = useState(null);
+  const [verificationFailed, setVerificationFailed] = useState(false);
+  const [verificationError, setVerificationError] = useState('');
+
+  // Then update the handleFightClick function
+  const handleFightClick = async () => {
+    if (!selectedCharacter) return;
     
-    if (!walletAddress && !isFreeGame) {
-      console.log("Wallet required for paid games");
-      setShowAlert(true);
-    } else {
-      // Proceed with fight logic
-      console.log("Fight started!");
-      socketRef.current.emit('joinGame', {
-        selectedCharacter,
-        betAmount: selectedButtonText,
-        // For free games, we'll pass the wallet if available, otherwise null
-        walletAddress: walletAddress 
+    try {
+      // For free games, proceed immediately
+      if (selectedButtonText === "Free!") {
+        proceedToGame();
+        return;
+      }
+      
+      // Check if wallet is connected
+      if (!walletAddress) {
+        setShowAlert(true);
+        return;
+      }
+      
+      // Reset verification states
+      setVerificationFailed(false);
+      setVerificationError('');
+      setTransactionSignature(null);
+      
+      // Request bet information from server
+      socketRef.current.emit('requestBetInfo', { betAmount: selectedButtonText });
+      setTransactionStatus('Calculating bet amount...');
+      setShowTransactionWaiting(true);
+      
+      // Wait for bet info
+      const betInfo = await new Promise((resolve, reject) => {
+        socketRef.current.once('betInfo', (data) => resolve(data));
+        socketRef.current.once('error', (error) => reject(error));
+        // Set timeout
+        setTimeout(() => reject(new Error('Request timeout')), 10000);
       });
       
-      setFightStarted(true);
-      setShowAnimation(true);
-      setTimeout(() => {
-        setShowAnimation(false);
-      }, 2000);
+      console.log('Received bet info:', betInfo);
+      
+      // No confirmation dialog - directly prepare transaction
+      if (!window.solana) {
+        setShowTransactionWaiting(false);
+        alert("Phantom wallet not found!");
+        return;
+      }
+      
+      // Connect to Solana network
+      const connection = new solanaWeb3.Connection(
+        'https://api.devnet.solana.com', 
+        'confirmed'
+      );
+      
+      // Create a transaction
+      setTransactionStatus('Preparing transaction...');
+      const transaction = new solanaWeb3.Transaction().add(
+        solanaWeb3.SystemProgram.transfer({
+          fromPubkey: new solanaWeb3.PublicKey(walletAddress),
+          toPubkey: new solanaWeb3.PublicKey(betInfo.recipientWallet),
+          lamports: Math.floor(betInfo.solAmount * solanaWeb3.LAMPORTS_PER_SOL),
+        })
+      );
+      
+      // Get the recent blockhash
+      const blockhash = await connection.getLatestBlockhash();
+      transaction.recentBlockhash = blockhash.blockhash;
+      transaction.feePayer = new solanaWeb3.PublicKey(walletAddress);
+      
+      // Update status
+      setTransactionStatus('Please approve transaction in your wallet...');
+      
+      // Send transaction using Phantom
+      const { signature } = await window.solana.signAndSendTransaction(transaction);
+      console.log('Transaction sent:', signature);
+      setTransactionSignature(signature);
+      
+      // Try to verify the payment
+      await verifyPayment(betInfo.paymentId, signature);
+      
+    } catch (error) {
+      console.error('Error in handleFightClick:', error);
+      setVerificationFailed(true);
+      setVerificationError(error.message);
+      setTransactionStatus(`Error: ${error.message}`);
     }
+  };
+
+  // Add a separate function for payment verification
+  const verifyPayment = async (paymentId, signature) => {
+    try {
+      setTransactionStatus('Transaction sent! Waiting for confirmation...');
+      
+      // Verify payment with server
+      socketRef.current.emit('verifyPayment', { 
+        paymentId, 
+        signature 
+      });
+      
+      const verificationResult = await new Promise((resolve, reject) => {
+        socketRef.current.once('paymentVerified', (data) => resolve(data));
+        socketRef.current.once('error', (error) => reject(error));
+        // Set timeout
+        setTimeout(() => reject(new Error('Verification timeout')), 30000);
+      });
+      
+      if (!verificationResult.success) {
+        setVerificationFailed(true);
+        setVerificationError(verificationResult.message);
+        setTransactionStatus(`Verification failed: ${verificationResult.message}`);
+        return false;
+      }
+      
+      // Hide waiting popup and proceed to game
+      setShowTransactionWaiting(false);
+      proceedToGame(true, paymentId, signature);
+      return true;
+    } catch (error) {
+      console.error('Error in verifyPayment:', error);
+      setVerificationFailed(true);
+      setVerificationError(error.message);
+      setTransactionStatus(`Verification error: ${error.message}`);
+      return false;
+    }
+  };
+
+  // Add a retry verification function
+  const handleRetryVerification = async () => {
+    if (!transactionSignature) {
+      setVerificationError('No transaction signature available to retry');
+      return;
+    }
+    
+    try {
+      setVerificationFailed(false);
+      setTransactionStatus('Retrying verification...');
+      
+      // Get the bet info from the current state
+      socketRef.current.emit('requestBetInfo', { betAmount: selectedButtonText });
+      
+      const betInfo = await new Promise((resolve, reject) => {
+        socketRef.current.once('betInfo', (data) => resolve(data));
+        socketRef.current.once('error', (error) => reject(error));
+        setTimeout(() => reject(new Error('Request timeout')), 10000);
+      });
+      
+      // Try verification again with the existing signature
+      await verifyPayment(betInfo.paymentId, transactionSignature);
+    } catch (error) {
+      console.error('Error in retry verification:', error);
+      setVerificationFailed(true);
+      setVerificationError(error.message);
+      setTransactionStatus(`Retry failed: ${error.message}`);
+    }
+  };
+
+  // Helper function to proceed to game
+  const proceedToGame = (verified = false, paymentId = null, signature = null) => {
+    if (!selectedCharacter) return;
+    
+    console.log(`Proceeding to game with character ${selectedCharacter.id}, betAmount: ${selectedButtonText}`);
+    
+    // Join the game with payment verification details
+    socketRef.current.emit('joinGame', {
+      selectedCharacter: selectedCharacter,
+      betAmount: selectedButtonText,
+      walletAddress: walletAddress || null,
+      verified: verified,
+      paymentId: paymentId,
+      signature: signature
+    });
+    
+    setFightStarted(true);
+    setShowAnimation(true);
+    
+    // Hide fight animation after 3 seconds
+    setTimeout(() => {
+      setShowAnimation(false);
+    }, 3000);
+    
+    setLoading(false);
   };
 
   const handleCharacterSelect = (character) => {
@@ -809,7 +1028,7 @@ useEffect(() => {
                 <div className="alert-content">
                   <h2>You have an active game!</h2>
                   <p>You're in the middle of a duel with bet amount: {playerActiveGame.betAmount}</p>
-                  <div className="alert-buttons">
+                  <div className="alert-buttons" style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
                     <button onClick={handleRejoinGame} className="alert-button">
                       Rejoin Game
                     </button>
@@ -1090,7 +1309,7 @@ useEffect(() => {
               {gameState.gameOver && (
               <div className="custom-alert">
                 <div className="alert-content">
-                  <h2>{gameState.winner === socketRef.current.id ? "You Win!" : "You Lose!"}</h2>
+                  <h2>{gameState.winner === socketRef.current.id || gameState.winner === walletAddress ? "You Win!" : "You Lose!"}</h2>
                   <p>{`Selected amount: ${selectedButtonText}`}</p>
                   <button onClick={handleUndoClick} className="alert-button">Play Again</button>
                 </div>
@@ -1112,6 +1331,59 @@ useEffect(() => {
             {roundActive && (
               <div className="round-timer">
                 {renderRoundTimer()}
+              </div>
+            )}
+
+            {/* Updated transaction waiting popup with retry button */}
+            {showTransactionWaiting && (
+              <div className="fancy-waiting-popup">
+                <div className="alert-content">
+                  <div className="loading-character">
+                    <img src={selectedCharacter ? selectedCharacter.image : "/images/characters/1.svg"} alt="Loading" />
+                  </div>
+                  <h2>Transaction in Progress</h2>
+                  <p>{transactionStatus}</p>
+                  
+                  {!verificationFailed && (
+                    <>
+                      <div className="loading-spinner"></div>
+                      <div className="loading-bar">
+                        <div className="loading-fill"></div>
+                      </div>
+                      <div className="waiting-tips">
+                        This usually takes 5-15 seconds to complete
+                      </div>
+                    </>
+                  )}
+                  
+                  {verificationFailed && (
+                    <>
+                      <div className="verification-error">
+                        <p>The transaction may have succeeded, but verification timed out.</p>
+                        <p className="error-details">{verificationError}</p>
+                      </div>
+                      <div className="verification-options" style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
+                        <button className="fight-button" style={{ minWidth: '150px' }} onClick={handleRetryVerification}>
+                          Verify Again
+                        </button>
+                        <button className="fight-button" style={{ minWidth: '150px' }} onClick={() => setShowTransactionWaiting(false)}>
+                          Cancel
+                        </button>
+                      </div>
+                      <div className="waiting-tips">
+                        You can check your transaction status:
+                        <a 
+                          href={`https://explorer.solana.com/tx/${transactionSignature}?cluster=devnet`} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="explorer-link"
+                        >
+                          View in Explorer
+                        </a>
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
             )}
           </div>
