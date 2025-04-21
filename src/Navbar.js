@@ -70,7 +70,7 @@ import './Navbar.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { Connection, PublicKey } from '@solana/web3.js';
 
-function Navbar({ setWalletAddress, soundEnabled, setSoundEnabled, gameInProgress, onNavigate }) {
+function Navbar({ setWalletAddress, soundEnabled, setSoundEnabled, gameInProgress, onNavigate, setShowAlert }) {
    const [walletAddress, setLocalWalletAddress] = useState(null);
    const navigate = useNavigate();
 
@@ -164,6 +164,22 @@ function Navbar({ setWalletAddress, soundEnabled, setSoundEnabled, gameInProgres
     }
   };
 
+  // Update the handleMyGamesClick function
+  const handleMyGamesClick = () => {
+    if (!walletAddress) {
+      // Trigger the custom alert in App.js instead of using a simple alert
+      setShowAlert(true);
+      return;
+    }
+    
+    // If wallet is connected, navigate to the my-games route
+    navigate('/my-games');
+  };
+
+  const handleContactClick = () => {
+    navigate('/contact');
+  };
+
   return (
     <nav className="navbar">
       {/* Make the logo clickable and navigate to home */}
@@ -187,8 +203,8 @@ function Navbar({ setWalletAddress, soundEnabled, setSoundEnabled, gameInProgres
             How to Play?
           </a>
         </li>
-        <li><a href="#mygames">My Games</a></li>
-        <li><a href="#contact">Contact</a></li>
+        <li><a  onClick={handleMyGamesClick}>My Games</a></li>
+        <li><a onClick={handleContactClick}>Contact</a></li>
       </ul>
 
       <div className="wallet-button-container">

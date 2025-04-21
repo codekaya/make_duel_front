@@ -2,10 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 import Navbar from './Navbar';
 import { io } from "socket.io-client";
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Link } from 'react-router-dom';
 import HowToPlay from './pages/HowToPlay';
 import * as solanaWeb3 from '@solana/web3.js';
 import { Buffer } from 'buffer';
+import MyGames from './pages/MyGames';
+import Contact from './pages/Contact';
 
 // Make Buffer available globally (this is the key fix)
 window.Buffer = Buffer;
@@ -1016,7 +1018,8 @@ useEffect(() => {
       <Navbar 
         setWalletAddress={setWalletAddress} 
         soundEnabled={soundEnabled} 
-        setSoundEnabled={setSoundEnabled} 
+        setSoundEnabled={setSoundEnabled}
+        setShowAlert={setShowAlert}
       />
       
       <Routes>
@@ -1390,6 +1393,22 @@ useEffect(() => {
         } />
         <Route path="/how-to-play" element={
           <HowToPlay 
+            soundEnabled={soundEnabled}
+            setSoundEnabled={setSoundEnabled}
+            setWalletAddress={setWalletAddress}
+          />
+        } />
+        <Route path="/my-games" element={
+          <MyGames 
+            walletAddress={walletAddress}
+            soundEnabled={soundEnabled}
+            setSoundEnabled={setSoundEnabled}
+            setWalletAddress={setWalletAddress}
+          />
+        } />
+        <Route path="/contact" element={
+          <Contact 
+            walletAddress={walletAddress}
             soundEnabled={soundEnabled}
             setSoundEnabled={setSoundEnabled}
             setWalletAddress={setWalletAddress}

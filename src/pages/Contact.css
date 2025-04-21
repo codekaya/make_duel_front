@@ -1,0 +1,319 @@
+/* Modern, elegant contact page styling */
+:root {
+  --primary: #ff416c;
+  --secondary: #4CAF50;
+  --accent: #8e2de2;
+  --dark-bg: #0a0b15;
+  --card-bg: rgba(16, 18, 27, 0.8);
+  --text: #ffffff;
+}
+
+.contact-container {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--dark-bg);
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(255, 65, 108, 0.1) 0%, transparent 20%),
+    radial-gradient(circle at 90% 80%, rgba(76, 175, 80, 0.1) 0%, transparent 20%);
+  color: var(--text);
+  padding: 50px 20px;
+  font-family: "Roboto", sans-serif;
+}
+
+.contact-content {
+  width: 100%;
+  max-width: 1100px;
+  background: rgba(14, 16, 25, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.contact-title {
+  text-align: center;
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 50px;
+  background: linear-gradient(to right, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  position: relative;
+}
+
+.contact-title::after {
+  content: '';
+  position: absolute;
+  bottom: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 3px;
+  background: linear-gradient(to right, var(--primary), var(--accent));
+  border-radius: 3px;
+}
+
+.contact-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+.contact-box {
+  background: var(--card-bg);
+  border-radius: 15px;
+  padding: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: transform 0.3s ease;
+}
+
+.contact-box:hover {
+  transform: translateY(-5px);
+}
+
+.contact-box h2 {
+  font-size: 1.8rem;
+  margin-bottom: 25px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* Social links */
+.contact-links {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.contact-links a {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: white;
+  padding: 15px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.contact-links a:hover {
+  background: rgba(0, 0, 0, 0.5);
+  transform: translateX(5px);
+}
+
+.contact-link-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  font-size: 1.5rem;
+}
+
+.twitter {
+  background: linear-gradient(45deg, #1DA1F2, #0d8ecf);
+}
+
+.discord {
+  background: linear-gradient(45deg, #7289DA, #4a67cf);
+}
+
+/* Email section */
+.email-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+}
+
+.email-item {
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.email-item:hover {
+  background: rgba(0, 0, 0, 0.4);
+  transform: translateY(-5px);
+}
+
+.email-item h3 {
+  font-size: 1.1rem;
+  margin: 0 0 10px 0;
+  color: #ccc;
+}
+
+.email-item a {
+  font-family: 'Roboto Mono', monospace;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.email-item a:hover {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+/* Back button */
+.back-button {
+  display: block;
+  margin: 0 auto;
+  padding: 12px 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 30px;
+  background: linear-gradient(to right, var(--primary), var(--accent));
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(142, 45, 226, 0.3);
+}
+
+.back-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(142, 45, 226, 0.5);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .contact-section {
+    grid-template-columns: 1fr;
+  }
+  
+  .email-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .contact-content {
+    padding: 30px 20px;
+  }
+  
+  .contact-title {
+    font-size: 2.5rem;
+  }
+}
+
+/* Add this to your existing Contact.css */
+.icon-text {
+  font-weight: bold;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+}
+
+.twitter .icon-text {
+  font-family: sans-serif;
+}
+
+.discord .icon-text {
+  font-family: 'Arial Black', sans-serif;
+  letter-spacing: -1px;
+}
+
+/* Add this to your Contact.css to style the email section */
+.single-email {
+  padding: 25px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.single-email:hover {
+  background: rgba(0, 0, 0, 0.4);
+  transform: translateY(-5px);
+}
+
+.single-email p {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #e0e0e0;
+  margin-bottom: 12px;
+}
+
+.main-email {
+  font-family: 'Roboto Mono', monospace;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 1.4rem;
+  font-weight: 600;
+  transition: color 0.3s ease;
+  display: block;
+  margin: 15px 0;
+}
+
+.main-email:hover {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.email-note {
+  font-size: 0.9rem;
+  opacity: 0.7;
+  margin-top: 15px;
+  font-style: italic;
+}
+
+/* Add Telegram icon styling */
+.telegram {
+  background: linear-gradient(45deg, #0088cc, #0077b5);
+}
+
+.telegram .icon-text {
+  font-family: 'Arial', sans-serif;
+  font-weight: 700;
+}
+
+/* Add this to your Contact.css for the email purpose list */
+.email-purpose-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 15px 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.email-purpose-list li {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 0.9rem;
+  color: #e0e0e0;
+  display: inline-block;
+}
+
+.email-purpose-list li:first-child {
+  background: rgba(76, 175, 80, 0.2);
+}
+
+.email-purpose-list li:nth-child(2) {
+  background: rgba(255, 193, 7, 0.2);
+}
+
+.email-purpose-list li:nth-child(3) {
+  background: rgba(244, 67, 54, 0.2);
+}
+
+.email-purpose-list li:nth-child(4) {
+  background: rgba(33, 150, 243, 0.2);
+} 
