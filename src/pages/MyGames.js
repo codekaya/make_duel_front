@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './MyGames.css'; // You'll need to create this CSS file
+import config from '../utils/config';
 
 function MyGames({ walletAddress, setWalletAddress, soundEnabled, setSoundEnabled }) {
   const [games, setGames] = useState([]);
@@ -23,7 +24,7 @@ function MyGames({ walletAddress, setWalletAddress, soundEnabled, setSoundEnable
       setLoading(true);
       try {
         // Get games from the server using fetch API
-        const response = await fetch(`http://localhost:5005/api/games?wallet=${walletAddress}`);
+        const response = await fetch(`${config.apiUrl}/api/games?wallet=${walletAddress}`);
         
         if (!response.ok) {
           throw new Error(`Server responded with status: ${response.status}`);

@@ -8,6 +8,7 @@ import * as solanaWeb3 from '@solana/web3.js';
 import { Buffer } from 'buffer';
 import MyGames from './pages/MyGames';
 import Contact from './pages/Contact';
+import config from './utils/config';
 
 // Make Buffer available globally (this is the key fix)
 window.Buffer = Buffer;
@@ -113,7 +114,8 @@ function App() {
   
   // Initialize socket connection
   useEffect(() => {
-    socketRef.current = io('https://duel-breaker-api.onrender.com');
+    // Use the socket URL from config
+    socketRef.current = io(config.socketUrl);
     
     // Add gameStats listener
     socketRef.current.on('gameStats', (stats) => {
