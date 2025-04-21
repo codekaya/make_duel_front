@@ -5,8 +5,8 @@ const configs = {
     socketUrl: 'http://localhost:5005',
   },
   production: {
-    apiUrl: 'https://api.duelbreaker.com', // Replace with your production API URL
-    socketUrl: 'https://api.duelbreaker.com', // Replace with your production socket URL
+    apiUrl: 'https://duel-breaker-api.onrender.com', // Replace with your production API URL
+    socketUrl: 'https://duel-breaker-api.onrender.com', // Replace with your production socket URL
   },
   // You can add more environments as needed (staging, testing, etc.)
 };
