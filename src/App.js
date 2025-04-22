@@ -103,6 +103,17 @@ function App() {
   // Add this new ref to track the current game phase
   const gamePhaseRef = useRef('idle'); // idle, round-active, round-ending, results-display
   
+  // Add these state variables for reward claiming
+  const [claimStatus, setClaimStatus] = useState('idle'); // 'idle', 'pending', 'success', 'error'
+  const [claimMessage, setClaimMessage] = useState('');
+  const [claimAmount, setClaimAmount] = useState(null);
+  const [claimTxSignature, setClaimTxSignature] = useState(null);
+  
+  // Add these state variables for game cancellation
+  const [cancelStatus, setCancelStatus] = useState('idle'); // 'idle', 'pending', 'success', 'error'
+  const [cancelMessage, setCancelMessage] = useState('');
+  const [cancelTxSignature, setCancelTxSignature] = useState(null);
+  
   // Add this effect at component level
   useEffect(() => {
     if (countdownRef.current && roundActive) {
@@ -431,6 +442,11 @@ function App() {
 
   // Then update the handleFightClick function
   const handleFightClick = async () => {
+    // Reset cancel status when starting a new game
+    setCancelStatus('idle');
+    setCancelMessage('');
+    setCancelTxSignature(null);
+    
     if (!selectedCharacter) return;
     
     try {
@@ -623,6 +639,11 @@ const handlePlayerHide = () => handlePlayerAction('hide');
   };
 
   const handleUndoClick = () => {
+    // Reset cancel status
+    setCancelStatus('idle');
+    setCancelMessage('');
+    setCancelTxSignature(null);
+    
     // Reset basic game state
     setSelectedCharacter(null);
     setIsButtonsOpen(true); 
@@ -1015,6 +1036,173 @@ useEffect(() => {
   };
 }, []);
 
+// Function to handle reward claim button click
+const handleClaimReward = async () => {
+  if (!socketRef.current || !walletAddress) {
+    setClaimStatus('error');
+    setClaimMessage('Wallet not connected');
+    return;
+  }
+  
+  // Reset claim state
+  setClaimStatus('pending');
+  setClaimMessage('Preparing your reward...');
+  setClaimAmount(null);
+  setClaimTxSignature(null);
+  
+  // Request reward from server
+  socketRef.current.emit('claimReward', {
+    sessionId: socketRef.current.sessionId || gameState.sessionId,
+    walletAddress: walletAddress
+  });
+};
+
+// Handle receiving the claim transaction from server
+useEffect(() => {
+  if (!socketRef.current) return;
+  
+  const handleClaimRewardResult = async (result) => {
+    console.log('Received claim reward result:', result);
+    
+    if (!result.success) {
+      setClaimStatus('error');
+      setClaimMessage(result.message || 'Failed to claim reward');
+      return;
+    }
+    
+    try {
+      setClaimMessage(`Preparing to send ${result.amount} SOL to your wallet...`);
+      
+      // Check if Phantom wallet is available
+      if (!window.solana || !window.solana.isPhantom) {
+        throw new Error('Phantom wallet not found');
+      }
+      
+      // Deserialize the transaction
+      const transaction = solanaWeb3.Transaction.from(
+        Buffer.from(result.transaction, 'base64')
+      );
+      
+      // Sign and send the transaction using Phantom
+      setClaimMessage('Please approve the transaction in your wallet...');
+      const { signature } = await window.solana.signAndSendTransaction(transaction);
+      console.log('Claim transaction sent:', signature);
+      
+      // Set success state with transaction details
+      setClaimStatus('success');
+      setClaimAmount(result.amount);
+      setClaimTxSignature(signature);
+      setClaimMessage(`You've successfully claimed ${result.amount} SOL!`);
+      
+      // Report the signature back to the server
+      socketRef.current.emit('recordClaimTransaction', {
+        sessionId: result.sessionId,
+        signature: signature
+      });
+      
+    } catch (error) {
+      console.error('Error processing claim reward:', error);
+      setClaimStatus('error');
+      setClaimMessage(`Failed to process reward: ${error.message}`);
+    }
+  };
+  
+  const handleRecordClaimResult = (result) => {
+    console.log('Record claim result:', result);
+    // No need to update UI here, we already did that after the transaction was sent
+  };
+  
+  socketRef.current.on('claimRewardResult', handleClaimRewardResult);
+  socketRef.current.on('recordClaimResult', handleRecordClaimResult);
+  
+  return () => {
+    socketRef.current.off('claimRewardResult', handleClaimRewardResult);
+    socketRef.current.off('recordClaimResult', handleRecordClaimResult);
+  };
+}, [socketRef.current, walletAddress]);
+
+// Function to handle game cancellation
+const handleCancelGame = async () => {
+  if (!socketRef.current || !walletAddress) {
+    setCancelStatus('error');
+    setCancelMessage('Wallet not connected');
+    return;
+  }
+  
+  // Reset cancel state
+  setCancelStatus('pending');
+  setCancelMessage('Preparing your refund...');
+  setCancelTxSignature(null);
+  
+  // Request cancellation from server
+  socketRef.current.emit('cancelGame', {
+    sessionId: socketRef.current.sessionId || gameState.sessionId,
+    walletAddress: walletAddress
+  });
+};
+
+// Handle receiving the cancellation transaction from server
+useEffect(() => {
+  if (!socketRef.current) return;
+  
+  const handleCancelGameResult = async (result) => {
+    console.log('Received cancel game result:', result);
+    
+    if (!result.success) {
+      setCancelStatus('error');
+      setCancelMessage(result.message || 'Failed to cancel game');
+      return;
+    }
+    
+    try {
+      setCancelMessage(`Preparing to refund ${result.amount} SOL to your wallet...`);
+      
+      // Check if Phantom wallet is available
+      if (!window.solana || !window.solana.isPhantom) {
+        throw new Error('Phantom wallet not found');
+      }
+      
+      // Deserialize the transaction
+      const transaction = solanaWeb3.Transaction.from(
+        Buffer.from(result.transaction, 'base64')
+      );
+      
+      // Sign and send the transaction using Phantom
+      setCancelMessage('Please approve the transaction in your wallet...');
+      const { signature } = await window.solana.signAndSendTransaction(transaction);
+      console.log('Cancellation transaction sent:', signature);
+      
+      // Set success state with transaction details
+      setCancelStatus('success');
+      setCancelTxSignature(signature);
+      setCancelMessage(`Your game has been cancelled and ${result.amount} SOL has been refunded!`);
+      
+      // Report the signature back to the server
+      socketRef.current.emit('recordCancelTransaction', {
+        sessionId: result.sessionId,
+        signature: signature
+      });
+      
+    } catch (error) {
+      console.error('Error processing game cancellation:', error);
+      setCancelStatus('error');
+      setCancelMessage(`Failed to process refund: ${error.message}`);
+    }
+  };
+  
+  const handleRecordCancelResult = (result) => {
+    console.log('Record cancel result:', result);
+  };
+  
+  socketRef.current.on('cancelGameResult', handleCancelGameResult);
+  socketRef.current.on('recordCancelResult', handleRecordCancelResult);
+  
+  return () => {
+    socketRef.current.off('cancelGameResult', handleCancelGameResult);
+    socketRef.current.off('recordCancelResult', handleRecordCancelResult);
+  };
+}, [socketRef.current, walletAddress]);
+
   return (
     <div className="App">
       <Navbar 
@@ -1121,11 +1309,18 @@ useEffect(() => {
 
             
 
-            {/* Waiting for player popup */}
+            {/* Waiting for player popup with cancel option */}
             {fightStarted && selectedCharacter && waitingForPlayer && (
               <div className="custom-alert fancy-waiting-popup">
                 <div className="alert-content">
-                  <h2>Waiting for an opponent to join...</h2>
+                  {cancelStatus !== 'success' && (
+                    <h2>Waiting for an opponent to join...</h2>
+                  )}
+                  
+                  {cancelStatus === 'success' && (
+                    <h2>Game Cancelled Successfully</h2>
+                  )}
+                  
                   <div className="loading-character">
                     {selectedCharacter && (
                       <img 
@@ -1134,30 +1329,95 @@ useEffect(() => {
                       />
                     )}
                   </div>
-                  <div className="loading-spinner"></div>
-                  <div className="loading-bar">
-                    <div className="loading-fill"></div>
-                  </div>
                   
+                  {cancelStatus === 'idle' && (
+                    <>
+                      <div className="loading-spinner"></div>
+                      <div className="loading-bar">
+                        <div className="loading-fill"></div>
+                      </div>
+                      
+                      {/* Game stats display */}
+                      <div className="game-stats">
+                        <div className="stat-item">
+                          <span className="stat-icon">👤</span>
+                          <span className="stat-value">{gameStats.onlinePlayers}</span>
+                          <span className="stat-label">Players Online</span>
+                        </div>
+                        <div className="stat-item">
+                          <span className="stat-icon">🎮</span>
+                          <span className="stat-value">{gameStats.activeGames}</span>
+                          <span className="stat-label">Active Games</span>
+                        </div>
+                      </div>
+                      
+                      <p className="waiting-tips">
+                        Battle tip: Stay patient, victory awaits!
+                      </p>
+                      
+                      {/* Only show cancel button for paid games */}
+                      {selectedButtonText !== "Free!" && (
+                        <div style={{ marginTop: '20px' }}>
+                          <button 
+                            onClick={handleCancelGame} 
+                            className="fight-button"
+                            style={{ minWidth: '200px' }}
+                          >
+                            Cancel & Get Refund
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  )}
                   
-                  
-                  {/* Game stats display */}
-                  <div className="game-stats">
-                    <div className="stat-item">
-                      <span className="stat-icon">👤</span>
-                      <span className="stat-value">{gameStats.onlinePlayers}</span>
-                      <span className="stat-label">Players Online</span>
+                  {/* Cancellation status messages */}
+                  {cancelStatus === 'pending' && (
+                    <div className="cancel-status pending" style={{ marginTop: '20px' }}>
+                      <div className="loading-spinner"></div>
+                      <p>{cancelMessage}</p>
                     </div>
-                    <div className="stat-item">
-                      <span className="stat-icon">🎮</span>
-                      <span className="stat-value">{gameStats.activeGames}</span>
-                      <span className="stat-label">Active Games</span>
-                    </div>
-                  </div>
+                  )}
                   
-                  <p className="waiting-tips">
-                    Battle tip: Stay patient, victory awaits!
-                  </p>
+                  {cancelStatus === 'success' && (
+                    <div className="cancel-status success" style={{ marginTop: '20px' }}>
+                      <p className="cancel-success-message">{cancelMessage}</p>
+                      {cancelTxSignature && (
+                        <a 
+                          href={`https://explorer.solana.com/tx/${cancelTxSignature}?cluster=devnet`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="solana-explorer-link"
+                          style={{ display: 'block', marginBottom: '20px' }}
+                        >
+                          View Transaction
+                        </a>
+                      )}
+                      
+                      {/* Add Return to Game button */}
+                      <button 
+                        onClick={handleUndoClick}
+                        className="fight-button"
+                        style={{ minWidth: '200px', marginTop: '15px' }}
+                      >
+                        Return to Game
+                      </button>
+                    </div>
+                  )}
+                  
+                  {cancelStatus === 'error' && (
+                    <div className="cancel-status error" style={{ marginTop: '20px' }}>
+                      <p className="cancel-error-message">{cancelMessage}</p>
+                      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '15px' }}>
+                        <button 
+                          onClick={handleCancelGame}
+                          className="fight-button"
+                          style={{ minWidth: '150px' }}
+                        >
+                          Retry
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -1310,13 +1570,80 @@ useEffect(() => {
               </div>
             )}
 
-              {/* Game Over Pop-up */}
+              {/* Updated Game Over Pop-up */}
               {gameState.gameOver && (
               <div className="custom-alert">
                 <div className="alert-content">
                   <h2>{gameState.winner === socketRef.current.id || gameState.winner === walletAddress ? "You Win!" : "You Lose!"}</h2>
                   <p>{`Selected amount: ${selectedButtonText}`}</p>
-                  <button onClick={handleUndoClick} className="alert-button">Play Again</button>
+                  
+                  {/* Add a container div for the buttons with margin and gap */}
+                  <div className="alert-buttons" style={{ display: 'flex', gap: '15px', justifyContent: 'center', marginTop: '20px' }}>
+                    {/* Show claim reward button only for winners of paid games */}
+                    {(gameState.winner === socketRef.current.id || gameState.winner === walletAddress) && 
+                    selectedButtonText !== "Free!" && 
+                    claimStatus === 'idle' && (
+                      <button 
+                        onClick={handleClaimReward} 
+                        className="fight-button"
+                        style={{ minWidth: '150px' }}
+                      >
+                        Claim Reward
+                      </button>
+                    )}
+                    
+                    {/* Always show Play Again button */}
+                    <button 
+                      onClick={handleUndoClick} 
+                      className="fight-button"
+                      style={{ minWidth: '150px' }}
+                    >
+                      {claimStatus === 'idle' || claimStatus === 'error' ? 'Play Again' : 'New Game'}
+                    </button>
+                  </div>
+                  
+                  {/* Claim status messages - ONLY show these to the winner */}
+                  {(gameState.winner === socketRef.current.id || gameState.winner === walletAddress) && (
+                    <>
+                      {claimStatus === 'pending' && (
+                        <div className="claim-status pending" style={{ marginTop: '20px' }}>
+                          <div className="loading-spinner small"></div>
+                          <p>{claimMessage}</p>
+                        </div>
+                      )}
+                      
+                      {claimStatus === 'success' && (
+                        <div className="claim-status success" style={{ marginTop: '20px' }}>
+                          <p className="claim-success-message">{claimMessage}</p>
+                          {claimTxSignature && (
+                            <a 
+                              href={`https://explorer.solana.com/tx/${claimTxSignature}?cluster=devnet`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="solana-explorer-link"
+                            >
+                              View Transaction
+                            </a>
+                          )}
+                        </div>
+                      )}
+                      
+                      {claimStatus === 'error' && (
+                        <div className="claim-status error" style={{ marginTop: '20px' }}>
+                          <p className="claim-error-message">{claimMessage}</p>
+                          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '15px' }}>
+                            <button 
+                              onClick={handleClaimReward}
+                              className="fight-button"
+                              style={{ minWidth: '150px' }}
+                            >
+                              Retry
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
               </div>
             )}
