@@ -1,9 +1,9 @@
 {
-  "short_name": "Duel Breaker",
-  "name": "Duel Breaker Game",
+  "short_name": "Dojo Duel",
+  "name": "Dojo Duel Game",
   "icons": [
     {
-      "src": "favicon.ico",
+      "src": "logo192.ico",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
     },

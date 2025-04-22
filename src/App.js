@@ -1293,7 +1293,7 @@ useEffect(() => {
                   <p className="potential-winnings">
                     If you win, you'll receive:  
                     <span>
-                      {(parseFloat(selectedButtonText.replace('$', '')) * 2 * 0.99).toFixed(2)}$
+                      {(parseFloat(selectedButtonText.replace('$', '')) * 2 * 0.97).toFixed(2)}$
                     </span>
                   </p>
                 )}
