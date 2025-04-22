@@ -14,21 +14,21 @@ function Contact() {
           <div className="contact-box social">
             <h2>Follow Us</h2>
             <div className="contact-links">
-              <a href="https://twitter.com/duelbreaker" target="_blank" rel="noopener noreferrer">
+              <a href="https://twitter.com/dojoduel" target="_blank" rel="noopener noreferrer">
                 <div className="contact-link-icon twitter">
                   <span className="icon-text">𝕏</span>
                 </div>
                 <span>Twitter</span>
               </a>
               
-              <a href="https://discord.gg/duelbreaker" target="_blank" rel="noopener noreferrer">
+              <a href="https://discord.gg/dojoduel" target="_blank" rel="noopener noreferrer">
                 <div className="contact-link-icon discord">
                   <span className="icon-text">D</span>
                 </div>
                 <span>Discord</span>
               </a>
               
-              <a href="https://t.me/duelbreaker" target="_blank" rel="noopener noreferrer">
+              <a href="https://t.me/dojoduel" target="_blank" rel="noopener noreferrer">
                 <div className="contact-link-icon telegram">
                   <span className="icon-text">T</span>
                 </div>
@@ -47,7 +47,7 @@ function Contact() {
                 <li>Bug reports</li>
                 <li>Game suggestions</li>
               </ul>
-              <a href="mailto:contact@duelbreaker.com" className="main-email">contact@duelbreaker.com</a>
+              <a href="mailto:contact@dojoduel.com" className="main-email">contact@dojoduel.com</a>
               <p className="email-note">We'll respond to your message as soon as possible!</p>
             </div>
           </div>

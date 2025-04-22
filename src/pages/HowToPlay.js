@@ -42,7 +42,7 @@ function HowToPlay() {
       <div className="how-to-play-content">
         <div className="game-header">
           <div className="game-title-decoration left"></div>
-          <h1 className="game-title">Duel Breaker</h1>
+          <h1 className="game-title">Dojo Duel</h1>
           <div className="game-title-decoration right"></div>
         </div>
         
@@ -77,9 +77,9 @@ function HowToPlay() {
           <div className="tab-content overview-tab">
             <div className="content-with-image">
               <div className="content-text">
-                <h2 className="overview-title">Welcome to Duel Breaker</h2>
+                <h2 className="overview-title">Welcome to Dojo Duel</h2>
                 
-                <p className="overview-intro">Duel Breaker is a fast-paced battle game where skilled fighters face off in high-stakes duels. Select your character, pay your entry fee, and prepare to outmaneuver your opponent!</p>
+                <p className="overview-intro">Dojo Duel is a fast-paced battle game where skilled fighters face off in high-stakes duels. Select your character, pay your entry fee, and prepare to outmaneuver your opponent!</p>
                 
                 <div className="feature-grid">
                   <div className="feature-item">
@@ -245,7 +245,7 @@ function HowToPlay() {
         {activeTab === 'combat' && (
           <div className="tab-content combat-tab">
             <h2>Combat System</h2>
-            <p className="tab-intro">Master the strategic combat system of Duel Breaker where prediction and counter-moves are key to victory!</p>
+            <p className="tab-intro">Master the strategic combat system of Dojo Duel where prediction and counter-moves are key to victory!</p>
             
             <div className="combat-mechanics">
               <div className="combat-section core-mechanics">
