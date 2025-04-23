@@ -119,8 +119,14 @@
   font-size: 1.5rem;
 }
 
+/* Update the Twitter/X background to black */
 .twitter {
-  background: linear-gradient(45deg, #1DA1F2, #0d8ecf);
+  background: #000000; /* Solid black background for X (formerly Twitter) */
+}
+
+/* Make sure the SVG is properly visible on black */
+.twitter .social-icon {
+  filter: brightness(0) invert(1); /* Ensures the icon is white */
 }
 
 .discord {
@@ -316,4 +322,39 @@
 
 .email-purpose-list li:nth-child(4) {
   background: rgba(33, 150, 243, 0.2);
-} 
+}
+
+/* Add this to your existing Contact.css file to style the image icons */
+.social-icon {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) invert(1); /* Makes the SVG icons white */
+  display: block;
+}
+
+/* You can remove or comment out the icon-text styles since we're not using them anymore */
+/* 
+.icon-text {
+  font-weight: bold;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+}
+
+.twitter .icon-text {
+  font-family: sans-serif;
+}
+
+.discord .icon-text {
+  font-family: 'Arial Black', sans-serif;
+  letter-spacing: -1px;
+}
+
+.telegram .icon-text {
+  font-family: 'Arial', sans-serif;
+  font-weight: 700;
+}
+*/ 

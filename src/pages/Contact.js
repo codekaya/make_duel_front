@@ -16,21 +16,21 @@ function Contact() {
             <div className="contact-links">
               <a href="https://twitter.com/dojoduel" target="_blank" rel="noopener noreferrer">
                 <div className="contact-link-icon twitter">
-                  <span className="icon-text">𝕏</span>
+                  <img src="/images/social/twitter.svg" alt="Twitter" className="social-icon" />
                 </div>
                 <span>Twitter</span>
               </a>
               
               <a href="https://discord.gg/dojoduel" target="_blank" rel="noopener noreferrer">
                 <div className="contact-link-icon discord">
-                  <span className="icon-text">D</span>
+                  <img src="/images/social/discord.svg" alt="Discord" className="social-icon" />
                 </div>
                 <span>Discord</span>
               </a>
               
               <a href="https://t.me/dojoduel" target="_blank" rel="noopener noreferrer">
                 <div className="contact-link-icon telegram">
-                  <span className="icon-text">T</span>
+                  <img src="/images/social/telegram.svg" alt="Telegram" className="social-icon" />
                 </div>
                 <span>Telegram</span>
               </a>
