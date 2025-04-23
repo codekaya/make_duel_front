@@ -16,13 +16,13 @@
 /* Main container with animated background */
 .how-to-play-container {
   min-height: 100vh;
-  background-color: #0c0c14;
-  color: #ffffff;
+  background: var(--dark-bg);
+  color: var(--text-color);
   position: relative;
   overflow-x: hidden;
   overflow-y: auto !important;
   padding: 80px 20px 20px 20px;
-  font-family: "Roboto", Arial, sans-serif;
+  font-family: var(--body-font);
   height: auto;
   max-height: none;
 }
@@ -341,13 +341,8 @@
 }
 
 .how-to-play-container .return-button:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4),
-              0 0 20px rgba(255, 65, 108, 0.4);
-}
-
-.how-to-play-container .return-button:hover::before {
-  left: 100%;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(255, 65, 108, 0.6);
 }
 
 .how-to-play-container .return-button:active {
@@ -2355,4 +2350,205 @@
 .outcome-both-heal p:first-child {
   color: rgba(180, 140, 250, 1);
   font-weight: 600;
+}
+
+/* Additional Character tab responsiveness */
+@media (max-width: 768px) {
+  /* Character grid responsiveness */
+  .how-to-play-container .character-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+  
+  .how-to-play-container .character-card {
+    padding: 15px;
+  }
+  
+  .how-to-play-container .character-image {
+    height: 120px;
+  }
+  
+  .how-to-play-container .character-name {
+    font-size: 1.2rem;
+  }
+  
+  /* Combat tab responsiveness */
+  .how-to-play-container .mechanics-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .how-to-play-container .formula-container {
+    flex-direction: column;
+  }
+  
+  .how-to-play-container .formula {
+    margin-bottom: 20px;
+  }
+  
+  /* Controls tab responsiveness */
+  .how-to-play-container .mouse-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .how-to-play-container .timing-visualization {
+    transform: scale(0.9);
+  }
+  
+  .how-to-play-container .timing-notes {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Character tab smaller screens */
+  .how-to-play-container .character-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .how-to-play-container .character-stats {
+    margin-top: 10px;
+  }
+  
+  .how-to-play-container .stat-name {
+    font-size: 0.8rem;
+  }
+  
+  /* Combat tab smaller screens */
+  .how-to-play-container .mechanic-item {
+    flex-direction: column;
+    text-align: center;
+    padding: 15px 10px;
+  }
+  
+  .how-to-play-container .mechanic-icon {
+    margin: 0 0 10px 0;
+  }
+  
+  .how-to-play-container .move-node {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .how-to-play-container .node-icon {
+    font-size: 20px;
+  }
+  
+  .how-to-play-container .node-label {
+    font-size: 12px;
+  }
+  
+  /* Ensure matrix is scrollable */
+  .how-to-play-container .matrix-container {
+    overflow-x: auto;
+    width: 100%;
+    padding-bottom: 10px;
+  }
+  
+  /* Controls tab smaller screens */
+  .how-to-play-container .control-card {
+    margin-bottom: 15px;
+  }
+  
+  .how-to-play-container .card-header {
+    margin-bottom: 15px;
+  }
+  
+  .how-to-play-container .card-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+  
+  .how-to-play-container .move-buttons, 
+  .how-to-play-container .prediction-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .how-to-play-container .move-button, 
+  .how-to-play-container .predict-button {
+    width: 100%;
+    margin: 0;
+  }
+  
+  .how-to-play-container .timer-bar {
+    height: 15px;
+  }
+  
+  .how-to-play-container .timer-markers {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 15px;
+  }
+  
+  .how-to-play-container .timer-marker {
+    margin: 5px 0;
+  }
+}
+
+/* Extra small device fine-tuning */
+@media (max-width: 360px) {
+  .how-to-play-container .character-image {
+    height: 100px;
+  }
+  
+  .how-to-play-container .character-name {
+    font-size: 1.1rem;
+  }
+  
+  .how-to-play-container .combat-section {
+    padding: 15px 10px;
+  }
+  
+  .how-to-play-container .section-subtitle {
+    font-size: 1.3rem;
+  }
+  
+  .how-to-play-container .triangle-diagram {
+    transform: scale(0.65);
+    height: 180px;
+  }
+  
+  .how-to-play-container .triangle-legend {
+    padding: 10px;
+  }
+  
+  .how-to-play-container .legend-icon {
+    font-size: 24px;
+  }
+  
+  .how-to-play-container .legend-text {
+    font-size: 14px;
+  }
+  
+  .how-to-play-container .card-header h4 {
+    font-size: 18px;
+  }
+}
+
+/* Ensure all styles are scoped to how-to-play-container */
+.how-to-play-container .navigation-footer {
+  margin-top: 30px;
+  text-align: center;
+}
+
+/* Scope return button to avoid affecting other components */
+.how-to-play-container .return-button {
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  border: none;
+  color: white;
+  padding: 12px 30px;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(255, 65, 108, 0.4);
+}
+
+.how-to-play-container .return-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(255, 65, 108, 0.6);
 }
