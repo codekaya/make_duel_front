@@ -5,6 +5,7 @@ import { Connection, PublicKey } from '@solana/web3.js';
 
 function Navbar({ setWalletAddress, soundEnabled, setSoundEnabled, gameInProgress, onNavigate, setShowAlert }) {
    const [walletAddress, setLocalWalletAddress] = useState(null);
+   const [menuOpen, setMenuOpen] = useState(false);
    const navigate = useNavigate();
 
   // Check if Phantom is installed
@@ -37,6 +38,16 @@ function Navbar({ setWalletAddress, soundEnabled, setSoundEnabled, gameInProgres
   const toggleSound = () => {
     setSoundEnabled(!soundEnabled);
     console.log("Sound toggled:", !soundEnabled);
+  };
+
+  // Toggle mobile menu
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
+
+  // Close menu after navigation
+  const closeMenu = () => {
+    setMenuOpen(false);
   };
 
   // Check if the wallet is already connected on page load/reload
@@ -91,9 +102,11 @@ function Navbar({ setWalletAddress, soundEnabled, setSoundEnabled, gameInProgres
     if (gameInProgress) {
       if (window.confirm('You have an active game in progress. If you leave, you will forfeit the match. Are you sure you want to leave?')) {
         navigate(path);
+        closeMenu();
       }
     } else {
       navigate(path);
+      closeMenu();
     }
   };
 
@@ -102,15 +115,18 @@ function Navbar({ setWalletAddress, soundEnabled, setSoundEnabled, gameInProgres
     if (!walletAddress) {
       // Trigger the custom alert in App.js instead of using a simple alert
       setShowAlert(true);
+      closeMenu();
       return;
     }
     
     // If wallet is connected, navigate to the my-games route
     navigate('/my-games');
+    closeMenu();
   };
 
   const handleContactClick = () => {
     navigate('/contact');
+    closeMenu();
   };
 
   return (
@@ -124,7 +140,27 @@ function Navbar({ setWalletAddress, soundEnabled, setSoundEnabled, gameInProgres
         Dojo Duel
       </div>
       
-      <ul className="navbar-links">
+      {/* Hamburger menu button for mobile */}
+      <button 
+        className="mobile-menu-button" 
+        onClick={toggleMenu}
+        aria-label="Toggle menu"
+      >
+        {menuOpen ? 
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+          : 
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        }
+      </button>
+      
+      <ul className={`navbar-links ${menuOpen ? 'open' : ''}`}>
         <li>
           <a 
             href="#" 
@@ -136,7 +172,7 @@ function Navbar({ setWalletAddress, soundEnabled, setSoundEnabled, gameInProgres
             How to Play?
           </a>
         </li>
-        <li><a  onClick={handleMyGamesClick}>My Games</a></li>
+        <li><a onClick={handleMyGamesClick}>My Games</a></li>
         <li><a onClick={handleContactClick}>Contact</a></li>
       </ul>
 

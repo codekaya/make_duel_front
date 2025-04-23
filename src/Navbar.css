@@ -194,3 +194,103 @@
     display: none;
   }
   
+  /* Responsive Navbar */
+  .mobile-menu-button {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 5px;
+  }
+  
+  /* Media queries for responsive design */
+  @media screen and (max-width: 900px) {
+    .navbar {
+      padding: 0.6rem 1rem;
+    }
+    
+    .navbar-logo {
+      font-size: 1.2rem;
+      margin-right: 0;
+    }
+    
+    .mobile-menu-button {
+      display: block;
+      z-index: 1001;
+    }
+    
+    .navbar-links {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 70%;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.9);
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding-top: 80px;
+      transition: right 0.3s ease;
+      z-index: 1000;
+    }
+    
+    .navbar-links.open {
+      right: 0;
+    }
+    
+    .navbar-links li {
+      margin: 20px 0;
+    }
+    
+    .wallet-button-container {
+      margin-left: 0;
+      gap: 10px;
+    }
+    
+    .wallet-button {
+      padding: 8px 16px;
+      font-size: 0.8rem;
+    }
+    
+    .wallet-button-container p {
+      font-size: 0.75rem;
+      max-width: 120px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .sound-toggle-button {
+      width: 32px;
+      height: 32px;
+    }
+  }
+  
+  @media screen and (max-width: 480px) {
+    .navbar {
+      padding: 0.4rem 0.8rem;
+    }
+    
+    .navbar-logo {
+      font-size: 1rem;
+    }
+    
+    .wallet-button {
+      padding: 6px 10px;
+      font-size: 0.7rem;
+    }
+    
+    .wallet-button-container p {
+      font-size: 0.65rem;
+      max-width: 80px;
+    }
+    
+    .sound-toggle-button {
+      width: 28px;
+      height: 28px;
+      margin-right: 5px;
+    }
+  }
+  
