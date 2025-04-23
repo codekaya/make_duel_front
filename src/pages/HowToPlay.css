@@ -740,6 +740,48 @@
   .how-to-play-container .tab-content h2 {
     font-size: 1.8rem;
   }
+  
+  .how-to-play-container .navigation-tabs {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .how-to-play-container .tab-button {
+    padding: 12px 15px;
+    font-size: 14px;
+    flex: 1 1 calc(50% - 10px);
+    min-width: 0;
+  }
+  
+  /* Overview tab adjustments */
+  .overview-tab .content-with-image {
+    flex-direction: column;
+  }
+  
+  .overview-tab .feature-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+  }
+  
+  /* Triangle diagram adjustments */
+  .triangle-diagram {
+    transform: scale(0.9);
+    margin: 10px auto;
+  }
+  
+  .triangle-legend {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  /* Controls adjustments */
+  .mouse-section .visual-container {
+    flex-direction: column;
+  }
+  
+  .controls-container .controls-row {
+    flex-direction: column;
+    gap: 20px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -748,11 +790,11 @@
   }
   
   .how-to-play-container .how-to-play-content {
-    padding: 20px 10px;
+    padding: 15px 10px;
   }
   
   .how-to-play-container .tab-content {
-    padding: 15px;
+    padding: 15px 10px;
   }
   
   .how-to-play-container .how-to-play-content::before,
@@ -761,14 +803,125 @@
     height: 40px;
   }
   
-  .how-to-play-container .character-grid, 
-  .how-to-play-container .moves-grid,
-  .how-to-play-container .controls-grid {
+  .how-to-play-container .tab-content h2 {
+    font-size: 1.5rem;
+  }
+  
+  .how-to-play-container .tab-button {
+    padding: 10px;
+    font-size: 12px;
+    margin-bottom: 5px;
+  }
+  
+  .how-to-play-container .overview-card, 
+  .how-to-play-container .character-card, 
+  .how-to-play-container .move-card, 
+  .how-to-play-container .combat-intro, 
+  .how-to-play-container .controls-card, 
+  .how-to-play-container .game-tips {
+    padding: 15px;
+  }
+  
+  /* Character cards for mobile */
+  .characters-tab .character-grid {
     grid-template-columns: 1fr;
   }
   
-  .how-to-play-container .tab-content h2 {
+  /* Combat section adjustments */
+  .section-subtitle {
     font-size: 1.5rem;
+  }
+  
+  .mechanics-container {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Move triangle adjustments */
+  .triangle-diagram {
+    transform: scale(0.8);
+    width: 100%;
+    height: 220px;
+    margin: 0 auto;
+  }
+  
+  /* Matrix responsiveness */
+  .matrix-container {
+    overflow-x: auto;
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .matrix-cell, .matrix-top, .matrix-side {
+    width: 140px;
+    min-width: 140px;
+  }
+  
+  .matrix-cell {
+    height: 150px;
+    font-size: 0.85rem;
+  }
+  
+  /* Game controls mobile view */
+  .controls-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+  }
+  
+  .control-card {
+    padding: 15px;
+  }
+  
+  .key {
+    width: 35px;
+    height: 35px;
+    font-size: 16px;
+  }
+  
+  /* Game tips mobile view */
+  .tips-container .tip-item {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .tips-container .tip-icon {
+    margin: 0 auto 10px;
+  }
+  
+  /* Return button */
+  .how-to-play-container .return-button {
+    width: 100%;
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 320px) {
+  .how-to-play-container .tab-button {
+    font-size: 11px;
+    padding: 8px 5px;
+  }
+  
+  .how-to-play-container .game-title {
+    font-size: 1.8rem;
+  }
+  
+  .triangle-diagram {
+    transform: scale(0.7);
+    height: 200px;
+  }
+  
+  .combat-section {
+    padding: 15px 10px;
+  }
+  
+  .matrix-cell, .matrix-top, .matrix-side {
+    width: 120px;
+    min-width: 120px;
+  }
+  
+  .matrix-corner {
+    width: 80px;
+    min-width: 80px;
   }
 }
 
