@@ -463,8 +463,8 @@ function HowToPlay() {
                   <div className="formula healing-formula">
                     <h4>Hide Healing Formula</h4>
                     <div className="formula-box">
-                      <p className="formula-text">Healing = Character's Defense Score ÷ 10</p>
-                      <p className="formula-example">Example: If character has DS=50, healing is 5 HP per Hide</p>
+                      <p className="formula-text">Healing = Character's Defense Score ÷ 3</p>
+                      <p className="formula-example">Example: If character has DS=60, healing is 20 HP per Hide</p>
                     </div>
                     <p className="formula-note">* Correct prediction adds +20% bonus healing</p>
                   </div>
