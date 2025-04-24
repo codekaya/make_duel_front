@@ -173,8 +173,8 @@ function Navbar({ setWalletAddress, soundEnabled, setSoundEnabled, gameInProgres
         </li>
         <li><a onClick={handleMyGamesClick}>My Games</a></li>
         <li><a onClick={handleContactClick}>Contact</a></li>
-        {/* Mobile-only menu item with proper class that will be strictly hidden on desktop */}
-        <li className="strictly-mobile-only"><a onClick={openEarlyAccessPopup}>Get Early Access</a></li>
+        {/* Mobile-only menu item that will be hidden on desktop */}
+        <li className="mobile-only-item"><a onClick={openEarlyAccessPopup}>Get Early Access</a></li>
       </ul>
 
       <div className="wallet-button-container">
@@ -268,7 +268,7 @@ function Navbar({ setWalletAddress, soundEnabled, setSoundEnabled, gameInProgres
                 rel="noopener noreferrer" 
                 className="devnet-share-button"
               >
-                Get Early Access Now
+                Apply for Early Access Now
               </a>
             </div>
           </div>

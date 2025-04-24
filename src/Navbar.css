@@ -770,3 +770,33 @@
     transform: scale(0.95);
   }
   
+  /* Hide mobile-only elements on desktop */
+  .mobile-only-item {
+    display: none !important;
+  }
+  
+  /* Media query for mobile devices */
+  @media (max-width: 768px) {
+    /* Show mobile-only elements on mobile */
+    .mobile-only-item {
+      display: block !important;
+    }
+    
+    /* When navbar is open in mobile view */
+    .navbar-links.open .mobile-only-item {
+      display: block !important;
+    }
+  }
+  
+  /* Remove the Early Access button from the top navbar */
+  .navbar .early-access-button {
+    display: none;
+  }
+  
+  /* Only show the Early Access button on larger screens */
+  @media (min-width: 769px) {
+    .navbar .early-access-button {
+      display: inline-block;
+    }
+  }
+  
