@@ -35,11 +35,12 @@
   .navbar-links {
     list-style: none;
     display: flex;
-    gap: 40px;
+    gap: 25px;
     margin: 0;
     padding: 0;
     flex: 1;
     justify-content: center;
+    
   }
   
   .navbar-links li {
@@ -315,5 +316,457 @@
     .wallet-button-container {
       gap: 8px;
     }
+  }
+  
+  /* Updated Early Access Button - Modern Font */
+  .early-access-button {
+    background: linear-gradient(135deg, #9945FF 0%, #14F195 100%);
+    border: 2px solid #14F195;
+    color: white;
+    padding: 8px 14px;
+    font-size: 1rem; /* Slightly adjusted size for readability */
+    /* Change font-family to a modern sans-serif stack */
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", sans-serif;
+    font-weight: 700; /* Add bold font weight */
+    letter-spacing: 0.5px; /* Subtle spacing */
+    text-transform: none; /* Remove uppercase */
+    border-radius: 15px;
+    cursor: pointer;
+    text-shadow: none; /* Remove text shadow for cleaner look */
+    box-shadow: 0 0 15px rgba(153, 69, 255, 0.5); /* Slightly softer shadow */
+    transition: transform 0.3s, box-shadow 0.3s;
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    width: 150px;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    margin-left: -15px;
+  }
+  
+  /* Keep existing pseudo-elements but maybe adjust shadow */
+  .early-access-button:before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(135deg, rgba(153, 69, 255, 0.2) 0%, rgba(20, 241, 149, 0.2) 100%); /* Softer shine */
+    transform: rotate(45deg);
+    animation: shine 3s infinite linear;
+    z-index: 1;
+  }
+  
+  /* Span styling remains */
+  .early-access-button span {
+    position: relative;
+    z-index: 2;
+    font-weight: 700; /* Ensure span text is also bold */
+  }
+  
+  /* Hover/Active states remain */
+  .early-access-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(153, 69, 255, 0.7); /* Slightly stronger hover shadow */
+  }
+  
+  .early-access-button:active {
+    transform: scale(0.95);
+  }
+  
+  /* Shine animation remains */
+  @keyframes shine {
+    0% {
+      left: -100%;
+      top: -100%;
+    }
+    100% {
+      left: 100%;
+      top: 100%;
+    }
+  }
+  
+  /* Ultra-modern Devnet popup with contemporary aesthetics */
+  .devnet-popup {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  }
+  
+  .devnet-popup-overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(8, 8, 16, 0.85);
+    backdrop-filter: blur(12px);
+    animation: fadeIn 0.4s ease-out;
+  }
+  
+  .devnet-popup-container {
+    position: relative;
+    width: 92%;
+    max-width: 520px;
+    background: linear-gradient(145deg, #1a1a1f, #0d0d10);
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.05);
+    animation: popupEnter 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    overflow: hidden;
+    z-index: 1;
+  }
+  
+  .devnet-popup-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 38px;
+    height: 38px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 20px;
+    font-weight: 300;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  
+  .devnet-popup-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    transform: rotate(90deg);
+  }
+  
+  .devnet-popup-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .devnet-title {
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: white;
+    margin: 0 0 12px 0;
+    text-align: center;
+    background: linear-gradient(120deg, #9945FF, #14F195);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .devnet-badge {
+    display: inline-block;
+    background: linear-gradient(90deg, rgba(153, 69, 255, 0.1), rgba(20, 241, 149, 0.1));
+    color: #14F195;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 18px;
+    border-radius: 100px;
+    margin-bottom: 36px;
+    letter-spacing: 0.02em;
+    border: 1px solid rgba(20, 241, 149, 0.3);
+  }
+  
+  .devnet-instructions {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    margin-bottom: 36px;
+  }
+  
+  .instruction-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+  }
+  
+  .instruction-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #9945FF, #14F195);
+    color: white;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  
+  .instruction-item p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+    line-height: 1.6;
+    padding-top: 4px;
+    font-weight: 400;
+  }
+  
+  .instruction-item a {
+    color: #14F195;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s;
+    border-bottom: 1px solid rgba(20, 241, 149, 0.3);
+    padding-bottom: 1px;
+  }
+  
+  .instruction-item a:hover {
+    color: #9945FF;
+    border-color: #9945FF;
+  }
+  
+  .devnet-tip {
+    background: rgba(20, 241, 149, 0.05);
+    border-radius: 16px;
+    padding: 20px;
+    width: 100%;
+    margin-bottom: 32px;
+    border: 1px solid rgba(20, 241, 149, 0.15);
+  }
+  
+  .devnet-tip p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 15px;
+    line-height: 1.6;
+    font-weight: 500;
+  }
+  
+  .devnet-share-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #9945FF, #14F195);
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 16px 32px;
+    border-radius: 100px;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    box-shadow: 0 4px 20px rgba(153, 69, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.02em;
+  }
+  
+  .devnet-share-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .devnet-share-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(153, 69, 255, 0.5);
+  }
+  
+  .devnet-share-button:hover::before {
+    opacity: 1;
+  }
+  
+  .devnet-share-button:active {
+    transform: translateY(1px);
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes popupEnter {
+    from {
+      opacity: 0;
+      transform: scale(0.96) translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+  
+  /* Responsive Adjustments */
+  @media screen and (max-width: 768px) {
+    .devnet-popup-container {
+      padding: 32px 24px;
+    }
+    
+    .devnet-title {
+      font-size: 30px;
+    }
+  }
+  
+  @media screen and (max-width: 480px) {
+    .devnet-popup-container {
+      padding: 28px 20px;
+      border-radius: 20px;
+    }
+    
+    .devnet-title {
+      font-size: 28px;
+    }
+    
+    .instruction-item {
+      gap: 14px;
+    }
+    
+    .instruction-item p {
+      font-size: 15px;
+    }
+    
+    .devnet-share-button {
+      width: 100%;
+      padding: 15px 24px;
+    }
+  }
+  
+  /* User Type Selection Styling */
+  .user-type-container {
+    margin-bottom: 25px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 15px;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+  }
+  
+  .user-type-label {
+    display: block;
+    color: #fff;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    font-weight: 500;
+  }
+  
+  .user-type-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .user-type-option {
+    position: relative;
+    cursor: pointer;
+  }
+  
+  .user-type-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .user-type-option label {
+    display: flex;
+    flex-direction: column;
+    padding: 12px 15px;
+    border-radius: 8px;
+    background: rgba(30, 30, 30, 0.7);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+  }
+  
+  .user-type-option label:hover {
+    background: rgba(40, 40, 40, 0.9);
+    border-color: rgba(76, 175, 80, 0.5);
+  }
+  
+  /* Style for selected option */
+  .user-type-option input[type="radio"]:checked + label {
+    background: rgba(76, 175, 80, 0.15);
+    border: 1px solid rgba(76, 175, 80, 0.8);
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+  }
+  
+  .user-type-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+  }
+  
+  /* Add a radio button look */
+  .user-type-title::before {
+    content: '';
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid #4CAF50;
+    margin-right: 10px;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+  }
+  
+  /* Fill radio when selected */
+  .user-type-option input[type="radio"]:checked + label .user-type-title::before {
+    background-color: #4CAF50;
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.7);
+  }
+  
+  .user-type-desc {
+    font-size: 0.85rem;
+    color: #aaa;
+    margin-left: 28px; /* Align with text after radio */
+  }
+  
+  /* Style description text when selected */
+  .user-type-option input[type="radio"]:checked + label .user-type-desc {
+    color: rgba(76, 175, 80, 0.9);
+  }
+  
+  .user-type-option input[type="radio"]:checked + label .user-type-title {
+    color: #4CAF50;
+  }
+  
+  /* Submit button (reusing fight-button styles) */
+  .submit-button {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    border: none;
+    padding: 12px 24px;
+    color: white;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    cursor: pointer;
+    text-transform: uppercase;
+    box-shadow: 0 0 15px rgba(76, 175, 80, 0.6);
+    transition: all 0.3s ease;
+  }
+  
+  .submit-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(76, 175, 80, 0.8);
+  }
+  
+  .submit-button:active {
+    transform: scale(0.95);
   }
   

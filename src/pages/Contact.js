@@ -21,7 +21,7 @@ function Contact() {
                 <span>Twitter</span>
               </a>
               
-              <a href="https://discord.gg/dojoduel" target="_blank" rel="noopener noreferrer">
+              <a href="https://discord.gg/aCx5Vm6w" target="_blank" rel="noopener noreferrer">
                 <div className="contact-link-icon discord">
                   <img src="/images/social/discord.svg" alt="Discord" className="social-icon" />
                 </div>

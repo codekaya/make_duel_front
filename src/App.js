@@ -1570,15 +1570,21 @@ useEffect(() => {
               </div>
             )}
 
-              {/* Updated Game Over Pop-up */}
+              {/* Game Over Pop-up */}
               {gameState.gameOver && (
               <div className="custom-alert">
                 <div className="alert-content">
                   <h2>{gameState.winner === socketRef.current.id || gameState.winner === walletAddress ? "You Win!" : "You Lose!"}</h2>
                   <p>{`Selected amount: ${selectedButtonText}`}</p>
                   
-                  {/* Add a container div for the buttons with margin and gap */}
-                  <div className="alert-buttons" style={{ display: 'flex', gap: '15px', justifyContent: 'center', marginTop: '20px' }}>
+                  {/* Adjusted button container with flex-wrap for better responsiveness */}
+                  <div className="alert-buttons" style={{ 
+                    display: 'flex', 
+                    gap: '10px', 
+                    justifyContent: 'center', 
+                    marginTop: '20px',
+                    flexWrap: 'wrap' 
+                  }}>
                     {/* Show claim reward button only for winners of paid games */}
                     {(gameState.winner === socketRef.current.id || gameState.winner === walletAddress) && 
                     selectedButtonText !== "Free!" && 
@@ -1586,7 +1592,7 @@ useEffect(() => {
                       <button 
                         onClick={handleClaimReward} 
                         className="fight-button"
-                        style={{ minWidth: '150px' }}
+                        style={{ minWidth: '140px' }}
                       >
                         Claim Reward
                       </button>
@@ -1596,9 +1602,35 @@ useEffect(() => {
                     <button 
                       onClick={handleUndoClick} 
                       className="fight-button"
-                      style={{ minWidth: '150px' }}
+                      style={{ minWidth: '140px' }}
                     >
                       {claimStatus === 'idle' || claimStatus === 'error' ? 'Play Again' : 'New Game'}
+                    </button>
+                    
+                    {/* Twitter Share Button with adjusted width */}
+                    <button 
+                      onClick={() => {
+                        const isWinner = gameState.winner === socketRef.current.id || gameState.winner === walletAddress;
+                        const tweetText = isWinner 
+                          ? `🏆 Won my first game at Dojo Duel! ${selectedButtonText !== "Free!" ? `Won ${(parseFloat(selectedButtonText.replace('$', '')) * 2 * 0.97).toFixed(2)}$` : ''} @dojoduel @colesseum`
+                          : `🎮 Played my first game at Dojo Duel! Ready for a rematch! @dojoduel @colesseum`;
+                        const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+                        window.open(tweetUrl, '_blank');
+                      }} 
+                      className="fight-button twitter-share"
+                      style={{ 
+                        minWidth: '180px', 
+                        backgroundColor: '#000000',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px'
+                      }}
+                    >
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="white">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
+                      </svg>
+                      Share
                     </button>
                   </div>
                   
