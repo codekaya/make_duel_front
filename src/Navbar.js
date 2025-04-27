@@ -263,7 +263,7 @@ function Navbar({ setWalletAddress, soundEnabled, setSoundEnabled, gameInProgres
               </div>
               
               <a 
-                href="https://app.deform.cc/form/0595ad87-3789-4910-8976-5ea84ffc1a87" 
+                href="https://app.deform.cc/form/258e4c2c-5582-47b2-9f59-3606d7f068b8/" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="devnet-share-button"
