@@ -427,6 +427,11 @@ function App() {
   }, [walletAddress, socketRef.current]);
 
   const handleClick = (buttonIndex) => {
+    // Add this check: Do nothing if a locked button is clicked
+    if (buttonIndex >= 3) {
+      
+      return;
+    }
     setSelectedButtonText(`${generateButtonText(buttonIndex)}`);
     setIsModalOpen(true); // Open the character selection modal
   };
@@ -1244,7 +1249,7 @@ useEffect(() => {
                 {[...Array(9)].map((_, index) => (
                   <button
                     key={index}
-                    className="fight-button"
+                    className="fight-button button-option"
                     onClick={() => handleClick(index)}
                     disabled={loading}
                   >

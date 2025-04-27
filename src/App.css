@@ -1528,3 +1528,89 @@ body {
   text-shadow: 0 0 10px rgba(255, 65, 108, 0.8);
 }
 
+/* Button hover effects */
+.button-option:hover {
+  transform: scale(1.05);
+  transition: all 0.3s ease;
+}
+
+/* Locked buttons (4-9) with curtain effect */
+.button-option:nth-child(n+4) {
+  position: relative;
+  overflow: hidden; /* Keep the curtain inside the button */
+  cursor: not-allowed;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); /* Much lighter shadow (0.4 → 0.2) */
+  border: none !important; /* Remove any borders */
+  outline: none !important; /* Remove outlines */
+}
+
+/* The black curtain overlay - expanded to cover any potential gaps */
+.button-option:nth-child(n+4)::before {
+  content: "";
+  position: absolute;
+  top: -1px; /* Slightly overflow */
+  left: -1px; /* Slightly overflow */
+  width: calc(100% + 2px); /* Expand width to cover edges */
+  height: calc(100% + 2px); /* Expand height to cover edges */
+  background-color: rgba(0, 0, 0, 0.4); /* Semi-transparent black overlay */
+  z-index: 2;
+  transition: all 0.3s ease;
+  border: none !important; /* Ensure no borders on the overlay */
+  pointer-events: none; /* Allow hover events to pass through to the button itself */
+}
+
+/* Make sure the button text remains visible but dimmed */
+.button-option:nth-child(n+4) span {
+  position: relative;
+  z-index: 3;
+  color: rgba(255, 255, 255, 0.5); /* Dimmed text */
+}
+
+/* Enhanced hover effect - no borders */
+.button-option:nth-child(n+4):hover {
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Much lighter shadow (0.5 → 0.3) */
+  transform: translateY(-3px); /* Slight lift on hover */
+  border: none !important; /* Ensure no borders on hover */
+}
+
+/* Slightly reveal the button on hover by making the curtain a bit more transparent */
+.button-option:nth-child(n+4):hover::before {
+  background-color: rgba(0, 0, 0, 0.6); /* Slightly more transparent on hover */
+}
+
+/* "Unlocked soon" text overlay on the button itself */
+.button-option:nth-child(n+4)::after {
+  content: "UNLOCKED SOON";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white; /* White text to match fight button */
+  font-weight: normal;
+  font-size: 0.7rem; /* Smaller size to fit */
+  text-align: center;
+  z-index: 5; /* Above the curtain */
+  opacity: 0; /* Hidden by default */
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  width: 90%; /* Control width to ensure it fits */
+  font-family: 'Press Start 2P', cursive; /* Same font as fight button */
+  text-transform: uppercase;
+  background: none; /* No background */
+  padding: 0; /* No padding */
+  text-shadow: 0 0 5px #ff416c, 0 0 10px #ff4b2b; /* Glow effect matching fight button */
+  letter-spacing: 0; /* Default letter spacing */
+}
+
+/* Show the text on hover with enhanced glow */
+.button-option:nth-child(n+4):hover::after {
+  opacity: 1;
+  text-shadow: 0 0 8px #ff416c, 0 0 15px #ff4b2b; /* Enhanced glow on hover */
+}
+
+/* Extra insurance against any edge lines */
+.button-option, .button-option * {
+  border: none !important;
+  outline: none !important;
+}
+
