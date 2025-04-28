@@ -1363,9 +1363,12 @@ useEffect(() => {
                 )}
                 <button className="fight-button-fancy" onClick={() => handleFightClick()} >Fight!</button>
 
-                {/* Undo Button inside character info */}
+                {/* Undo Button inside character info - with SVG icon instead of Unicode */}
                 <button className="undo-button" onClick={handleUndoClick}>
-                  &#x21A9; {/* Unicode for Undo symbol */}
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M9 14L4 9l5-5"/>
+                    <path d="M4 9h11a4 4 0 0 1 0 8h-1"/>
+                  </svg>
                 </button>
 
               </div>
