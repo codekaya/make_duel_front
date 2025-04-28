@@ -30,6 +30,13 @@ const characters = [
   { id: 9, name: "Samurai", info: "A disciplined samurai with a code of honor.", image: "/images/characters/9.svg", health: 100, fightScore: 55, defendScore: 45 }
 ];
 
+// Add this function at the top level of the file, outside the App component
+const preloadImages = (images) => {
+  images.forEach((src) => {
+    const img = new Image();
+    img.src = src;
+  });
+};
 
 function App() {
   const [loading, setLoading] = useState(false);
@@ -113,6 +120,9 @@ function App() {
   const [cancelStatus, setCancelStatus] = useState('idle'); // 'idle', 'pending', 'success', 'error'
   const [cancelMessage, setCancelMessage] = useState('');
   const [cancelTxSignature, setCancelTxSignature] = useState(null);
+  
+  // Add this near the top of your component, just after your state variables
+  const [imagesLoaded, setImagesLoaded] = useState(false);
   
   // Add this effect at component level
   useEffect(() => {
@@ -1208,8 +1218,50 @@ useEffect(() => {
   };
 }, [socketRef.current, walletAddress]);
 
+  // Add this useEffect for preloading images
+  useEffect(() => {
+    // Extract all character images for preloading
+    const characterImages = characters.map(character => character.image);
+    preloadImages(characterImages);
+    console.log('Preloading character images...');
+  }, []);
+
+  // Add this useEffect after your preloading useEffect
+  useEffect(() => {
+    // Track loading status for all character images
+    let loadedCount = 0;
+    const totalImages = characters.length;
+    
+    const handleImageLoad = () => {
+      loadedCount++;
+      if (loadedCount === totalImages) {
+        setImagesLoaded(true);
+        console.log('All character images loaded successfully');
+      }
+    };
+    
+    // Create image elements for preloading with load tracking
+    characters.forEach(character => {
+      const img = new Image();
+      img.onload = handleImageLoad;
+      img.onerror = () => console.error(`Failed to load image: ${character.image}`);
+      img.src = character.image;
+    });
+  }, []);
+
   return (
     <div className="App">
+      {/* Hidden image preloader */}
+      <div style={{ display: 'none' }}>
+        {characters.map(character => (
+          <img 
+            key={character.id} 
+            src={character.image} 
+            alt="preload" 
+          />
+        ))}
+      </div>
+      
       <Navbar 
         setWalletAddress={setWalletAddress} 
         soundEnabled={soundEnabled} 
@@ -1265,22 +1317,29 @@ useEffect(() => {
               <div className="modal">
                 <div className="modal-content">
                   <h2>Select Your Character</h2>
-                  <div className="character-list">
-                    {characters.map((character) => (
-                      <div 
-                        key={character.id} 
-                        className="character-option" 
-                        onClick={() => handleCharacterSelect(character)}
-                      >
-                        <img src={character.image} alt={character.name} className="character-image" />
-                        <div className="character-info-overlay">
-                          <h3>{character.name}</h3>
-                          <p>Fight Score: {character.fightScore}</p>
-                          <p>Defense: {character.defendScore}</p>
+                  {!imagesLoaded ? (
+                    <div className="loading-spinner-container">
+                      <div className="loading-spinner"></div>
+                      <p>Loading characters...</p>
+                    </div>
+                  ) : (
+                    <div className="character-list">
+                      {characters.map((character) => (
+                        <div 
+                          key={character.id} 
+                          className="character-option" 
+                          onClick={() => handleCharacterSelect(character)}
+                        >
+                          <img src={character.image} alt={character.name} className="character-image" />
+                          <div className="character-info-overlay">
+                            <h3>{character.name}</h3>
+                            <p>Fight Score: {character.fightScore}</p>
+                            <p>Defense: {character.defendScore}</p>
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             )}

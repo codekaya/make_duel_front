@@ -350,7 +350,37 @@ body {
   transform: scale(1.1); /* Slight zoom on hover */
 }
 
+/* Responsive styling for undo button */
+@media screen and (max-width: 768px) {
+  .undo-button {
+    width: 50px;
+    height: 50px;
+    font-size: 26px;
+    bottom: 15px;
+    left: 15px;
+  }
+}
 
+@media screen and (max-width: 480px) {
+  .undo-button {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    bottom: 10px;
+    left: 10px;
+  }
+}
+
+/* For very small screens */
+@media screen and (max-width: 320px) {
+  .undo-button {
+    width: 35px;
+    height: 35px;
+    font-size: 18px;
+    bottom: 8px;
+    left: 8px;
+  }
+}
 
 /*----------------------------------------------------------------------------------------------------*/
 /* Styling for Selected Amount (Dollar) */
@@ -1612,5 +1642,19 @@ body {
 .button-option, .button-option * {
   border: none !important;
   outline: none !important;
+}
+
+.loading-spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.loading-spinner-container p {
+  margin-top: 15px;
+  font-size: 1rem;
+  color: #333;
 }
 
